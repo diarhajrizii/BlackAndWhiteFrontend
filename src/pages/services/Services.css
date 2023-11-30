@@ -1,0 +1,143 @@
+.services-container{
+    max-width: 1200px !important;
+    margin: 0 auto;
+    padding: 50px 50px;
+    align-items: center;
+    height: 100%;
+    min-height: 800px;
+}
+.services-page-container{
+    background-color: #111111
+}
+.services-page-number{
+    font-family: 'Saira ExtraCondensed';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 300px;
+    line-height: 60px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.05em;
+    color: #FFFFFF;
+    margin-bottom: 40px;
+}
+
+.services-page-title{
+    margin-top: 90px !important;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 60px;
+    line-height: 60px;
+    margin-bottom: 24px !important;
+    color: #FFFFFF;
+}
+
+.services-page-text-info{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #7E7E7E;
+}
+
+.services-page-info-text{
+    margin-bottom: 80px;
+}
+
+.btn-img-container{
+    margin-bottom: 45px;
+}
+
+.services-content-title{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 28px;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.services-content-info{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #7E7E7E;
+}
+.vector-img-container{
+    margin-bottom: 10px;
+}
+
+.btn-info-row{
+    padding-right: 30px !important;
+}
+
+.digital-row{
+    padding-left: 0px !important;
+}
+
+.who-we-are-txt{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 60px;
+    line-height: 60px;
+    color: #FFFFFF;
+}
+.who-1-txt{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 28px;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+}
+.who-2-txt{
+    left: 29.86%;
+    right: 0%;
+    top: 34.12%;
+    bottom: 0%;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #7E7E7E;
+}
+.number-txt{
+    line-height: normal !important;
+    font-family: 'Saira ExtraCondensed';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 250px;
+    line-height: 60px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.05em;
+    color: #FFFFFF;
+}
+
+.our-services-txt{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 60px;
+    line-height: 60px;
+    color: #FFFFFF;
+}
+.we-work-txt{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #7E7E7E;
+}
+.services-container .line-container .page-name{
+    text-align: start !important;
+}

@@ -1,0 +1,33 @@
+.nav_container{
+    margin-right: 230px;
+    margin-left: 300px;
+}
+.header_container-nav{
+    background-color: #111111;
+    height: 66px;
+}
+.header_container{
+    max-width: 1440px;
+    margin: 0 auto;
+}
+.cl_nav_link a{
+    text-decoration: none;
+    width: 93px;
+    height: 26px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 26px;
+    color: #fff;
+}
+.cl_nav_link{
+    padding: 20px !important;
+}
+.cl_nav_link .active {
+    border-left: 2px solid #DF1B4A;
+    padding-left: 3px;
+}
+ul{
+    list-style-type: none;
+}

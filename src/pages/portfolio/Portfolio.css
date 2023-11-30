@@ -1,0 +1,140 @@
+.portfolio-container-page{
+    max-width: 1200px !important;
+    margin: 0 auto;
+    padding: 50px 50px;
+    align-items: center;
+    height: 100%;
+    min-height: 800px;
+    background: #ffffff !important;
+}
+.portfolio-page-info-text{
+    margin-bottom: 60px;
+}
+.portfolio-page-sport-info{
+    margin-bottom: 60px;
+}
+.portfolio-page-awards-info{
+    margin-bottom: 60px;
+}
+.dubai-text{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #4D4D4D;
+}
+.omega-text{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 28px;
+    color: #111518;
+}
+.portfolio-page-number{
+    font-family: 'Saira ExtraCondensed';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 300px;
+    line-height: 60px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.05em;
+    color: #111518;
+    margin-bottom: 40px;
+}
+.portfolio-page-title{
+    margin-top: 90px !important;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 60px;
+    line-height: 60px;
+    color: #111518;
+    margin-bottom: 24px !important;
+}
+.portfolio-page-text-info{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+}
+.dubai-globe-text{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 28px;
+    color: #111518;
+}
+.internation-football-text{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #4D4D4D;
+}
+.line-container{
+    margin-bottom: 200px;
+}
+.see-more-container{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    align-items: center;
+    color: #4D4D4D;
+}
+
+@media only screen and (max-width: 600px) {
+    .portfolio-page-number{
+        font-family: 'Saira ExtraCondensed';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 150px;
+        line-height: 60px;
+        display: flex;
+        align-items: center;
+        letter-spacing: -0.05em;
+        color: #111518;
+        margin-bottom: 25px;
+    }
+    .portfolio-page-title{
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 30px;
+        color: #111518;
+        margin-top: 24px !important;
+    }
+    .line-container{
+        margin-bottom: 10px; 
+    }
+    .contento{
+        display: none !important;
+    }
+    .portfolio-container-page{
+        padding: 10px !important;
+    }
+    .desert-clasic-img{
+        width: 95%;
+    }
+    .soccer-awards-img{
+        width: inherit;
+    }
+    .soccer-awards-img-container{
+        display: none;
+    }
+    .dubai-globe-text{
+        margin-top: 20px !important;
+        margin-bottom: 30px;
+    }
+    .portfolio-page-info-text{
+        justify-content:start !important;
+    }
+}
