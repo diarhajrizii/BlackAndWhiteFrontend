@@ -8,6 +8,7 @@ import {
   FormGroup,
   Form,
   Input,
+  CardTitle,
   Row,
   Col,
 } from "reactstrap";
@@ -17,7 +18,6 @@ function AddProducts() {
   const [brand, setBrand] = useState("");
   const [type, setType] = useState("gjysem-cizme");
   const [color, setColor] = useState("black");
-  const [price, setPrice] = useState(0);
   const [stockPrice, setStockPrice] = useState(0);
   const [importPrice, setImportPrice] = useState(0);
   const [sizes, setSizes] = useState({
@@ -43,10 +43,6 @@ function AddProducts() {
 
   const handleColorChange = (e) => {
     setColor(e.target.value);
-  };
-
-  const handlePriceChange = (e) => {
-    setPrice(parseFloat(e.target.value));
   };
 
   const handleStockPriceChange = (e) => {
@@ -75,14 +71,13 @@ function AddProducts() {
       brand,
       type,
       color,
-      price,
       stockPrice,
       importPrice,
       sizes: sizesData,
     };
 
     // Send data to the API endpoint
-    fetch("https://your-api-url/api/v1/add/product", {
+    fetch("/api/v1/products/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +100,9 @@ function AddProducts() {
         <Col md="12">
           <Card>
             <CardHeader>
-              <h5 className="title">Add Product</h5>
+              {/* <h5 className="title"></h5> */}
+              <h5 className="card-category">Add Product</h5>
+              <CardTitle tag="h2">Products</CardTitle>
             </CardHeader>
             <CardBody>
               <Form>
@@ -162,17 +159,7 @@ function AddProducts() {
                   </Col>
                 </Row>
                 <Row>
-                  <Col md="4">
-                    <FormGroup>
-                      <label>Price</label>
-                      <Input
-                        type="number"
-                        value={price}
-                        onChange={handlePriceChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md="4">
+                  <Col md="6">
                     <FormGroup>
                       <label>Stock Price</label>
                       <Input
@@ -182,7 +169,7 @@ function AddProducts() {
                       />
                     </FormGroup>
                   </Col>
-                  <Col md="4">
+                  <Col md="6">
                     <FormGroup>
                       <label>Import Price</label>
                       <Input

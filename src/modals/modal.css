@@ -1,0 +1,15 @@
+/* styles.css */
+.add-item-modal .modal-content {
+  background-color: #27293d !important;
+}
+.add-item-modal .modal-content .modal-footer {
+  padding: 0px 24px 24px 24px;
+}
+.add-item-modal .form-group input {
+  margin-bottom: 5px;
+}
+.add-item-modal .form-group label {
+  margin-left: 2px !important;
+  margin-bottom: 0.1rem !important;
+}
+/* .form-group; */

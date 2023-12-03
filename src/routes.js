@@ -24,6 +24,7 @@ import TableList from "views/TableList.js";
 import Typography from "views/Typography.js";
 import UserProfile from "views/UserProfile.js";
 import AddProducts from "views/AddProducts.js";
+import CMSPanel from "views/CmsPanels.js";
 
 var routes = [
   {
@@ -38,7 +39,7 @@ var routes = [
     path: "",
     name: "Products",
     rtlName: "لوحة القيادة",
-    icon: "tim-icons icon-chart-pie-36",
+    icon: "tim-icons icon-bag-16",
     component: <Dashboard />,
     layout: "#",
     subItems: [
@@ -60,6 +61,15 @@ var routes = [
       },
       // Add/Edit/Delete Product items here...
     ],
+  },
+  {
+    path: "/cms",
+    name: "CMS Panels",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-chart-pie-36",
+    component: <CMSPanel />,
+    // redirect: true,
+    layout: "/admin",
   },
   {
     path: "/add/products",
