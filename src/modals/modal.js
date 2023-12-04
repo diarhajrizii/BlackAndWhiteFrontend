@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// modal.js
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -10,15 +11,36 @@ import {
   Label,
   Input,
 } from "reactstrap";
+import "./modal.css";
+import {
+  saveColorData,
+  saveBrandData,
+  saveTypeData,
+  saveNumberData,
+  editBrandData,
+  editColorData,
+  editNumberData,
+  editTypeData,
+} from "../api.js"; // Import API functions
 
-import { saveColorData, saveBrandData, saveNumberData } from "../api.js"; // Import API functions
-
-import "./modal.css"; // Importing the CSS file
-
-const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
-  const [formData, setFormData] = useState({}); // State to hold form data
-
+const AddItemModal = ({
+  modalOpen,
+  toggleModal,
+  itemType,
+  addNewItem,
+  setTableData,
+  editItemData,
+  setEditItemData,
+  tableData,
+  // updateModalData, // Receive the function to update modal data
+}) => {
   let modalTitle = "";
+  console.log({ editItemData });
+  const [formData, setFormData] = useState({});
+
+  useEffect(() => {
+    setFormData(editItemData); // Update formData when editItemData changes
+  }, [editItemData]);
 
   switch (itemType) {
     case "brands":
@@ -30,32 +52,80 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
     case "numbers":
       modalTitle = "Add New Number";
       break;
+    case "types":
+      modalTitle = "Add New Type";
+      break;
     default:
       modalTitle = "";
   }
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    console.log({ name, value });
+    setEditItemData({ ...editItemData, [name]: value }); // Update the modal data
+  };
+
+  const updateItemProperty = (formData, tableData) => {
+    const updatedItems = tableData.map((item) => {
+      if (item.id === formData.id) {
+        const updatedItem = { ...item }; // Create a new object to hold the updated values
+        const keys = Object.keys(formData);
+
+        for (let j = 0; j < keys.length; j++) {
+          const element = keys[j];
+          updatedItem[element] = formData[element];
+        }
+
+        return updatedItem; // Return the updated item
+      }
+
+      return item;
+    });
+    setTableData(updatedItems);
+    toggleModal();
   };
 
   const handleSubmit = async () => {
     try {
-      switch (itemType) {
-        case "brands":
-          await saveBrandData(formData);
-          break;
-        case "colors":
-          await saveColorData(formData);
-          break;
-        case "numbers":
-          await saveNumberData(formData);
-          break;
-        default:
-          break;
+      let data;
+      if (!editItemData.id) {
+        switch (itemType) {
+          case "brands":
+            data = await saveBrandData(formData);
+            break;
+          case "colors":
+            data = await saveColorData(formData);
+            break;
+          case "numbers":
+            data = await saveNumberData(formData);
+            break;
+          case "types":
+            data = await saveTypeData(formData);
+            break;
+          default:
+            break;
+        }
+        const newObj = { id: data.data, ...formData };
+        console.log({ newObj });
+        addNewItem(newObj);
+      } else {
+        switch (itemType) {
+          case "brands":
+            data = await editBrandData(formData);
+            break;
+          case "colors":
+            data = await editColorData(formData);
+            break;
+          case "numbers":
+            data = await editNumberData(formData);
+            break;
+          case "types":
+            data = await editTypeData(formData);
+            break;
+          default:
+            break;
+        }
+        updateItemProperty(formData, tableData);
       }
-      setFormData({});
-      toggleModal();
     } catch (error) {
       console.error("Error saving data:", error);
     }
@@ -74,14 +144,16 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
                   type="text"
                   name="brandName"
                   id="brandName"
+                  value={editItemData.brandName || ""}
                   placeholder="Enter Brand Name"
                   onChange={handleInputChange}
                 />
                 <Label for="stateName">Manufacturing Country</Label>
                 <Input
                   type="text"
-                  name="stateName"
+                  name="produced"
                   id="stateName"
+                  value={editItemData.produced || ""}
                   placeholder="Enter Manufacturing Country name"
                   onChange={handleInputChange}
                 />
@@ -90,12 +162,14 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
           )}
           {itemType === "colors" && (
             <>
+              {console.log({ editItemData })}
               <FormGroup>
                 <Label for="colorName">Color Name</Label>
                 <Input
                   type="text"
                   name="colorName"
                   id="colorName"
+                  value={editItemData.colorName || ""}
                   placeholder="Enter basic color name"
                   onChange={handleInputChange}
                 />
@@ -104,6 +178,7 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
                   type="text"
                   name="albanianName"
                   id="albanianName"
+                  value={editItemData.albanianName || ""}
                   placeholder="Enter albanian color name"
                   onChange={handleInputChange}
                 />
@@ -112,6 +187,7 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
                   type="text"
                   name="englishName"
                   id="englishName"
+                  value={editItemData.englishName || ""}
                   placeholder="Enter english color name"
                   onChange={handleInputChange}
                 />
@@ -120,6 +196,7 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
                   type="text"
                   name="turkishName"
                   id="turkishName"
+                  value={editItemData.turkishName || ""}
                   placeholder="Enter turkish name"
                   onChange={handleInputChange}
                 />
@@ -134,7 +211,24 @@ const AddItemModal = ({ modalOpen, toggleModal, itemType }) => {
                   type="text"
                   name="number"
                   id="number"
+                  value={editItemData.number || ""}
                   placeholder="Enter Number"
+                  onChange={handleInputChange}
+                />
+              </FormGroup>
+            </>
+          )}
+          {itemType === "types" && (
+            <>
+              {console.log(editItemData)}
+              <FormGroup>
+                <Label for="type">Type</Label>
+                <Input
+                  type="text"
+                  name="type"
+                  id="type"
+                  value={editItemData.type || ""}
+                  placeholder="Enter Type"
                   onChange={handleInputChange}
                 />
               </FormGroup>

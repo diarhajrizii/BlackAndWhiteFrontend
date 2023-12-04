@@ -1,3 +1,4 @@
+// CMSPanel.js
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import {
@@ -11,17 +12,19 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import AddItemModal from "../modals/modal.js"; // Import the AddItemModal component
+import AddItemModal from "../modals/modal.js";
+import DeleteItemModal from "../modals/deleteModal.js";
 
 function CMSPanel() {
   const [tableData, setTableData] = useState([]);
   const [activeButton, setActiveButton] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [modalItemType, setModalItemType] = useState("");
 
   const fetchTableData = async (button) => {
     try {
-      const response = await fetch(`/api/v1/cms/${button}`);
+      const response = await fetch(`/api/v1/panels/${button}`);
       const responseData = await response.json();
       setTableData(responseData.success ? responseData.data.data : []);
       setActiveButton(button);
@@ -31,10 +34,21 @@ function CMSPanel() {
       setActiveButton("");
     }
   };
+  const [editItemData, setEditItemData] = useState({});
+  const openEditModal = (item) => {
+    setModalItemType(activeButton); // Set the modal type (brands, colors, numbers)
+    setEditItemData(item); // Set the item data for editing
+    setModalOpen(true); // Open the modal
+  };
+  const openDeleteModal = (item) => {
+    setModalItemType(activeButton); // Set the modal type (brands, colors, numbers)
+    setEditItemData(item); // Set the item data for editing
+    setDeleteModalOpen(true); // Open the modal
+  };
 
   useEffect(() => {
-    fetchTableData("brands"); // Set default table to "brands"
-  }, []); // Empty dependency array to run this effect only once
+    fetchTableData("brands");
+  }, []);
 
   const handleButtonClick = (button) => {
     if (button !== activeButton) {
@@ -42,11 +56,20 @@ function CMSPanel() {
     }
   };
 
-  // ... existing functions (fetchTableData, handleButtonClick, renderTableHeaders)
-
   const toggleModal = (itemType) => {
+    setEditItemData({});
     setModalItemType(itemType);
     setModalOpen(!modalOpen);
+  };
+  //  const toggleDeleteModal = (itemType) => {
+  //   setEditItemData({});
+  //   setModalItemType(itemType);
+  //   setModalOpen(!modalOpen);
+  //  }
+  const addNewItem = (formData) => {
+    const updatedTableData = [...tableData, formData];
+    setTableData(updatedTableData);
+    toggleModal();
   };
 
   const renderTableHeaders = () => {
@@ -57,10 +80,13 @@ function CMSPanel() {
         return ["ID", "Brand Name", "Produced", ""];
       case "numbers":
         return ["ID", "Number", ""];
+      case "types":
+        return ["ID", "Type", ""];
       default:
         return [];
     }
   };
+
   return (
     <>
       <div className="content">
@@ -109,6 +135,17 @@ function CMSPanel() {
                   >
                     Numbers
                   </Button>
+                  <Button
+                    tag="label"
+                    color="info"
+                    size="sm"
+                    className={classNames("btn-simple", {
+                      active: activeButton === "types",
+                    })}
+                    onClick={() => handleButtonClick("types")}
+                  >
+                    Types
+                  </Button>
                 </ButtonGroup>
               </Col>
               <Col sm="12">
@@ -139,9 +176,17 @@ function CMSPanel() {
                     ))}
 
                     <td align="right" key={index}>
-                      <Button color="link">
-                        <i class="tim-icons icon-pencil"></i>
+                      <Button color="link" onClick={() => openEditModal(item)}>
+                        <i className="tim-icons icon-pencil"></i>
                         <span className="d-lg-none d-md-block">Edit</span>
+                      </Button>
+
+                      <Button
+                        color="link"
+                        onClick={() => openDeleteModal(item)}
+                      >
+                        <i className="tim-icons icon-trash-simple"></i>
+                        <span className="d-lg-none d-md-block">Delete</span>
                       </Button>
                     </td>
                   </tr>
@@ -150,19 +195,26 @@ function CMSPanel() {
             </Table>
           </CardBody>
         </Card>
+        <AddItemModal
+          modalOpen={modalOpen}
+          toggleModal={() => setModalOpen(!modalOpen)}
+          itemType={modalItemType}
+          addNewItem={addNewItem}
+          setTableData={setTableData}
+          tableData={tableData}
+          editItemData={editItemData} // Pass the editItemData state
+          setEditItemData={setEditItemData}
+        />
+        <DeleteItemModal
+          modalOpen={deleteModalOpen}
+          toggleModal={() => setDeleteModalOpen(!deleteModalOpen)}
+          itemType={modalItemType}
+          setTableData={setTableData}
+          tableData={tableData}
+          editItemData={editItemData} // Pass the editItemData state
+          setEditItemData={setEditItemData}
+        />
       </div>
-      <Button
-        color="primary"
-        onClick={() => toggleModal(activeButton)}
-        className="float-right"
-      >
-        Add
-      </Button>
-      <AddItemModal
-        modalOpen={modalOpen}
-        toggleModal={() => toggleModal(activeButton)}
-        itemType={modalItemType}
-      />
     </>
   );
 }

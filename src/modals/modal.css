@@ -12,4 +12,7 @@
   margin-left: 2px !important;
   margin-bottom: 0.1rem !important;
 }
+.add-item-modal .modal-title {
+  color: white !important;
+}
 /* .form-group; */
