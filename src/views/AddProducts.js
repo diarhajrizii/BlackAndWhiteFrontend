@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import showAlert from "../components/Alert/alert";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -13,21 +14,66 @@ import {
   Col,
 } from "reactstrap";
 
+async function fetchPanelData(endpoint) {
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching panel data:", error);
+    return [];
+  }
+}
+
 function AddProducts() {
   const [code, setCode] = useState("");
   const [brand, setBrand] = useState("");
-  const [type, setType] = useState("gjysem-cizme");
-  const [color, setColor] = useState("black");
+  const [type, setType] = useState("");
+  const [color, setColor] = useState("");
   const [stockPrice, setStockPrice] = useState(0);
   const [importPrice, setImportPrice] = useState(0);
-  const [sizes, setSizes] = useState({
-    36: 0,
-    37: 0,
-    38: 0,
-    39: 0,
-    40: 0,
-    41: 0,
-  });
+  const [sizes, setSizes] = useState({});
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [colorOptions, setColorOptions] = useState([]);
+  const [numberOptions, setNumberOptions] = useState([]);
+  const [typeOptions, setTypeOptions] = useState([]);
+
+  useEffect(() => {
+    async function fetchDataFromAPIs() {
+      try {
+        const [brandData, colorData, numberData, typeData] = await Promise.all([
+          fetchPanelData("/api/v1/panels/brands"),
+          fetchPanelData("/api/v1/panels/colors"),
+          fetchPanelData("/api/v1/panels/numbers"),
+          fetchPanelData("/api/v1/panels/types"),
+        ]);
+        console.log(brandData.data.data);
+        setBrandOptions(brandData.data.data);
+        setColorOptions(colorData.data.data);
+        setNumberOptions(numberData.data.data);
+        setTypeOptions(typeData.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    const initialSizes = {};
+    console.log(numberOptions);
+    numberOptions.forEach((number) => {
+      initialSizes[number.number] = 0; // Assuming number.id corresponds to sizes like 36, 37, etc.
+    });
+    setSizes(initialSizes);
+    fetchDataFromAPIs();
+  }, [numberOptions]);
 
   const handleCodeChange = (e) => {
     setCode(e.target.value);
@@ -58,40 +104,39 @@ function AddProducts() {
     setSizes(newSize);
   };
 
-  const handleSave = () => {
-    // Prepare the data object for each size quantity
-    const sizesData = Object.keys(sizes).map((size) => ({
-      size: parseInt(size, 10),
-      quantity: sizes[size],
-    }));
+  const handleSave = async () => {
+    try {
+      const sizesData = Object.keys(sizes).map((size) => ({
+        size: parseInt(size, 10),
+        quantity: sizes[size],
+      }));
 
-    // Prepare the data object for the entire product
-    const data = {
-      code,
-      brand,
-      type,
-      color,
-      stockPrice,
-      importPrice,
-      sizes: sizesData,
-    };
+      const data = {
+        code,
+        brand,
+        type,
+        color,
+        stockPrice,
+        importPrice,
+        sizes: sizesData,
+      };
 
-    // Send data to the API endpoint
-    fetch("/api/v1/products/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        // Handle the response
-        console.log("Product added successfully!", response);
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error("Error adding product:", error);
+      const response = await fetch("/api/v1/products/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      console.log("Product added successfully!", response);
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
   };
 
   return (
@@ -100,7 +145,6 @@ function AddProducts() {
         <Col md="12">
           <Card>
             <CardHeader>
-              {/* <h5 className="title"></h5> */}
               <h5 className="card-category">Add Product</h5>
               <CardTitle tag="h2">Products</CardTitle>
             </CardHeader>
@@ -121,10 +165,16 @@ function AddProducts() {
                     <FormGroup>
                       <label>Brand</label>
                       <Input
-                        type="text"
+                        type="select"
                         value={brand}
                         onChange={handleBrandChange}
-                      />
+                      >
+                        {brandOptions.map((brand) => (
+                          <option key={brand.id} value={brand.id}>
+                            {brand.brandName}
+                          </option>
+                        ))}
+                      </Input>
                     </FormGroup>
                   </Col>
                 </Row>
@@ -137,9 +187,11 @@ function AddProducts() {
                         value={type}
                         onChange={handleTypeChange}
                       >
-                        <option value="gjysem-cizme">Gjysem-Cizme</option>
-                        <option value="cizme">Cizme</option>
-                        <option value="sandalle">Sandalle</option>
+                        {typeOptions.map((type) => (
+                          <option key={type.id} value={type.id}>
+                            {type.type}
+                          </option>
+                        ))}
                       </Input>
                     </FormGroup>
                   </Col>
@@ -151,9 +203,11 @@ function AddProducts() {
                         value={color}
                         onChange={handleColorChange}
                       >
-                        <option value="black">Black</option>
-                        <option value="green">Green</option>
-                        <option value="white">White</option>
+                        {colorOptions.map((color) => (
+                          <option key={color.id} value={color.id}>
+                            {color.colorName}
+                          </option>
+                        ))}
                       </Input>
                     </FormGroup>
                   </Col>
