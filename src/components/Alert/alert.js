@@ -1,14 +1,15 @@
 import React from "react";
 function Alert(place, color, message) {
+  if (!message) return true;
   var type;
   switch (color) {
-    case 404:
+    case 1:
       type = "primary";
       break;
     case 200:
       type = "success";
       break;
-    case 3:
+    case 400:
       type = "danger";
       break;
     case 4:
