@@ -1,5 +1,4 @@
 /* eslint-disable no-throw-literal */
-import NotificationAlert from "react-notification-alert";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -14,6 +13,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import NotificationAlert from "react-notification-alert";
 import Alert from "../components/Alert/alert";
 
 async function fetchPanelData(endpoint) {
@@ -29,8 +29,7 @@ async function fetchPanelData(endpoint) {
       throw new Error("Network response was not ok");
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("Error fetching panel data:", error);
     return [];
@@ -63,9 +62,10 @@ function AddProducts() {
         setBrandOptions(brandData.data.data);
         setColorOptions(colorData.data.data);
         setTypeOptions(typeData.data.data);
-        setBrand(brandData.data.data[0].id);
-        setType(colorData.data.data[0].id);
-        setColor(typeData.data.data[0].id);
+        setBrand(brandData.data.data[0]?.id || 0);
+        setType(colorData.data.data[0]?.id || 0);
+        setColor(typeData.data.data[0]?.id || 0);
+
         const initialSizes = {};
         numberData.data.data.forEach((number) => {
           initialSizes[number.number] = 0;
@@ -76,7 +76,7 @@ function AddProducts() {
       }
     }
     fetchDataFromAPIs();
-  }, []); // Empty dependency array to execute only once when mounted
+  }, []);
 
   const handleCodeChange = (e) => {
     setCode(e.target.value);
@@ -109,9 +109,9 @@ function AddProducts() {
 
   const handleSave = async () => {
     try {
-      const sizesData = Object.keys(sizes).map((size) => ({
+      const sizesData = Object.entries(sizes).map(([size, quantity]) => ({
         size: parseInt(size, 10),
-        quantity: sizes[size],
+        quantity: parseInt(quantity, 10),
       }));
 
       const data = {
@@ -124,14 +124,21 @@ function AddProducts() {
         sizes: sizesData,
       };
 
-      if (!code) throw { message: "Code input is empty!" };
-      if (!brand) throw { message: "Please select the brand!" };
-      if (!type) throw { message: "Please select the type!" };
-      if (!color) throw { message: "Please select the color!" };
-      if (!importPrice) throw { message: "Import price input is empty" };
-      if (!stockPrice) throw { message: "Stock price input is empty!" };
-      if (!stockPrice) throw { message: "Stock price input is empty!" };
-      if (!importPrice) throw { message: "Import price input is empty" };
+      const requiredFields = {
+        code,
+        brand,
+        type,
+        color,
+        stockPrice,
+        importPrice,
+      };
+      for (const key in requiredFields) {
+        if (!requiredFields[key]) {
+          throw new Error(
+            `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`
+          );
+        }
+      }
 
       const response = await fetch("/api/v1/products/products", {
         method: "POST",
@@ -140,9 +147,10 @@ function AddProducts() {
         },
         body: JSON.stringify(data),
       });
+      const returnData = await response.json();
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      if (!returnData.success) {
+        throw new Error(returnData.message);
       }
 
       setCode("");
@@ -152,12 +160,13 @@ function AddProducts() {
       setStockPrice(0);
       setType(0);
 
-      const options = Alert("tr", 200, "Product was added successfully");
+      const options = Alert(200, "Product was added successfully");
       notificationAlertRef.current.notificationAlert(options);
     } catch (error) {
-      const options = Alert("tr", 400, error.message);
+      const errorMessage = error.message || "Error adding product";
+      console.error(errorMessage);
+      const options = Alert(400, errorMessage);
       notificationAlertRef.current.notificationAlert(options);
-      console.error("Error adding product:", error);
     }
   };
 

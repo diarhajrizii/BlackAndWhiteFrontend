@@ -1,5 +1,5 @@
 import React from "react";
-function Alert(place, color, message) {
+function Alert(color, message) {
   if (!message) return true;
   var type;
   switch (color) {
@@ -22,7 +22,7 @@ function Alert(place, color, message) {
       break;
   }
   return {
-    place: place,
+    place: "tr",
     message: (
       <div>
         <div>{message}</div>
