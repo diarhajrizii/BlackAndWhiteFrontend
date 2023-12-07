@@ -1,4 +1,3 @@
-import showAlert from "../components/Alert/alert";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -45,7 +44,6 @@ function AddProducts() {
   const [sizes, setSizes] = useState({});
   const [brandOptions, setBrandOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
-  const [numberOptions, setNumberOptions] = useState([]);
   const [typeOptions, setTypeOptions] = useState([]);
 
   useEffect(() => {
@@ -60,20 +58,18 @@ function AddProducts() {
         console.log(brandData.data.data);
         setBrandOptions(brandData.data.data);
         setColorOptions(colorData.data.data);
-        setNumberOptions(numberData.data.data);
         setTypeOptions(typeData.data.data);
+        const initialSizes = {};
+        numberData.data.data.forEach((number) => {
+          initialSizes[number.number] = 0;
+        });
+        setSizes(initialSizes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
-    const initialSizes = {};
-    console.log(numberOptions);
-    numberOptions.forEach((number) => {
-      initialSizes[number.number] = 0; // Assuming number.id corresponds to sizes like 36, 37, etc.
-    });
-    setSizes(initialSizes);
     fetchDataFromAPIs();
-  }, [numberOptions]);
+  }, []); // Empty dependency array to execute only once when mounted
 
   const handleCodeChange = (e) => {
     setCode(e.target.value);
