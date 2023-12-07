@@ -1,3 +1,5 @@
+/* eslint-disable no-throw-literal */
+import NotificationAlert from "react-notification-alert";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -12,6 +14,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import Alert from "../components/Alert/alert";
 
 async function fetchPanelData(endpoint) {
   try {
@@ -35,10 +38,11 @@ async function fetchPanelData(endpoint) {
 }
 
 function AddProducts() {
+  const notificationAlertRef = React.useRef(null);
   const [code, setCode] = useState("");
-  const [brand, setBrand] = useState("");
-  const [type, setType] = useState("");
-  const [color, setColor] = useState("");
+  const [brand, setBrand] = useState(0);
+  const [type, setType] = useState(0);
+  const [color, setColor] = useState(0);
   const [stockPrice, setStockPrice] = useState(0);
   const [importPrice, setImportPrice] = useState(0);
   const [sizes, setSizes] = useState({});
@@ -55,10 +59,13 @@ function AddProducts() {
           fetchPanelData("/api/v1/panels/numbers"),
           fetchPanelData("/api/v1/panels/types"),
         ]);
-        console.log(brandData.data.data);
+
         setBrandOptions(brandData.data.data);
         setColorOptions(colorData.data.data);
         setTypeOptions(typeData.data.data);
+        setBrand(brandData.data.data[0].id);
+        setType(colorData.data.data[0].id);
+        setColor(typeData.data.data[0].id);
         const initialSizes = {};
         numberData.data.data.forEach((number) => {
           initialSizes[number.number] = 0;
@@ -117,6 +124,13 @@ function AddProducts() {
         sizes: sizesData,
       };
 
+      if (!code) throw { message: "Code input is empty!" };
+      if (!brand) throw { message: "Please select the brand!" };
+      if (!type) throw { message: "Please select the type!" };
+      if (!color) throw { message: "Please select the color!" };
+      if (!importPrice) throw { message: "Import price input is empty" };
+      if (!stockPrice) throw { message: "Stock price input is empty!" };
+
       const response = await fetch("/api/v1/products/products", {
         method: "POST",
         headers: {
@@ -129,14 +143,27 @@ function AddProducts() {
         throw new Error("Network response was not ok");
       }
 
-      console.log("Product added successfully!", response);
+      setCode("");
+      setBrand(brandOptions[0]);
+      setColor(colorOptions[0]);
+      setImportPrice(0);
+      setStockPrice(0);
+      setType(0);
+
+      const options = Alert("tr", 200, "Product was added successfully");
+      notificationAlertRef.current.notificationAlert(options);
     } catch (error) {
+      const options = Alert("tr", 400, error.message);
+      notificationAlertRef.current.notificationAlert(options);
       console.error("Error adding product:", error);
     }
   };
 
   return (
     <div className="content">
+      <div className="react-notification-alert-container">
+        <NotificationAlert ref={notificationAlertRef} />
+      </div>
       <Row>
         <Col md="12">
           <Card>
@@ -211,21 +238,21 @@ function AddProducts() {
                 <Row>
                   <Col md="6">
                     <FormGroup>
-                      <label>Stock Price</label>
-                      <Input
-                        type="number"
-                        value={stockPrice}
-                        onChange={handleStockPriceChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md="6">
-                    <FormGroup>
                       <label>Import Price</label>
                       <Input
                         type="number"
                         value={importPrice}
                         onChange={handleImportPriceChange}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md="6">
+                    <FormGroup>
+                      <label>Stock Price</label>
+                      <Input
+                        type="number"
+                        value={stockPrice}
+                        onChange={handleStockPriceChange}
                       />
                     </FormGroup>
                   </Col>
