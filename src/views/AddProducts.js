@@ -130,6 +130,8 @@ function AddProducts() {
       if (!color) throw { message: "Please select the color!" };
       if (!importPrice) throw { message: "Import price input is empty" };
       if (!stockPrice) throw { message: "Stock price input is empty!" };
+      if (!stockPrice) throw { message: "Stock price input is empty!" };
+      if (!importPrice) throw { message: "Import price input is empty" };
 
       const response = await fetch("/api/v1/products/products", {
         method: "POST",
