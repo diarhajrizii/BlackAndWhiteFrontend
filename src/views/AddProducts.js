@@ -95,11 +95,11 @@ function AddProducts() {
   };
 
   const handleStockPriceChange = (e) => {
-    setStockPrice(parseFloat(e.target.value));
+    setStockPrice(parseInt(e.target.value));
   };
 
   const handleImportPriceChange = (e) => {
-    setImportPrice(parseFloat(e.target.value));
+    setImportPrice(parseInt(e.target.value));
   };
 
   const handleSizeQuantityChange = (e, size) => {

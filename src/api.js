@@ -11,7 +11,6 @@ const saveColorData = async (colorData) => {
     });
     const responseData = await response.json();
     // Handle response data if needed
-    console.log(responseData);
     return responseData; // Return response data if needed
   } catch (error) {
     console.error("Error saving color data:", error);
@@ -30,7 +29,6 @@ const saveBrandData = async (brandData) => {
     });
     const responseData = await response.json();
     // Handle response data if needed
-    console.log(responseData);
     return responseData; // Return response data if needed
   } catch (error) {
     console.error("Error saving brand data:", error);
@@ -49,7 +47,6 @@ const saveNumberData = async (numberData) => {
     });
     const responseData = await response.json();
     // Handle response data if needed
-    console.log(responseData);
     return responseData; // Return response data if needed
   } catch (error) {
     console.error("Error saving color data:", error);
@@ -107,7 +104,6 @@ const deleteItem = async (endpoint, data) => {
     return responseData; // Return response data if needed
   } catch (error) {
     console.error(`Error saving ${endpoint} data:`, error);
-    // Handle errors
   }
 };
 
@@ -117,7 +113,6 @@ const editColorData = async (colorData) => {
 };
 
 const editBrandData = async (brandData) => {
-  console.log({ brandData });
   return await saveData("brand", brandData);
 };
 

@@ -22,6 +22,7 @@ import {
   editNumberData,
   editTypeData,
 } from "../api.js"; // Import API functions
+import Alert from "../components/Alert/alert";
 
 const AddItemModal = ({
   modalOpen,
@@ -31,11 +32,11 @@ const AddItemModal = ({
   setTableData,
   editItemData,
   setEditItemData,
+  notificationAlertRef,
   tableData,
   // updateModalData, // Receive the function to update modal data
 }) => {
   let modalTitle = "";
-  console.log({ editItemData });
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
@@ -60,7 +61,6 @@ const AddItemModal = ({
   }
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log({ name, value });
     setEditItemData({ ...editItemData, [name]: value }); // Update the modal data
   };
 
@@ -80,8 +80,14 @@ const AddItemModal = ({
 
       return item;
     });
+
     setTableData(updatedItems);
     toggleModal();
+    const options = Alert(
+      200,
+      `Item of ${itemType} with ID:${formData.id} has updated successfully`
+    );
+    notificationAlertRef.current.notificationAlert(options);
   };
 
   const handleSubmit = async () => {
@@ -105,7 +111,6 @@ const AddItemModal = ({
             break;
         }
         const newObj = { id: data.data, ...formData };
-        console.log({ newObj });
         addNewItem(newObj);
       } else {
         switch (itemType) {
@@ -162,7 +167,6 @@ const AddItemModal = ({
           )}
           {itemType === "colors" && (
             <>
-              {console.log({ editItemData })}
               <FormGroup>
                 <Label for="colorName">Color Name</Label>
                 <Input
@@ -220,7 +224,6 @@ const AddItemModal = ({
           )}
           {itemType === "types" && (
             <>
-              {console.log(editItemData)}
               <FormGroup>
                 <Label for="type">Type</Label>
                 <Input

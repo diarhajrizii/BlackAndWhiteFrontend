@@ -87,6 +87,7 @@ var routes = [
     rtlName: "الرموز",
     icon: "tim-icons icon-atom",
     component: <Icons />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -95,6 +96,7 @@ var routes = [
     rtlName: "خرائط",
     icon: "tim-icons icon-pin",
     component: <Map />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -103,6 +105,7 @@ var routes = [
     rtlName: "إخطارات",
     icon: "tim-icons icon-bell-55",
     component: <Notifications />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -111,6 +114,7 @@ var routes = [
     rtlName: "ملف تعريفي للمستخدم",
     icon: "tim-icons icon-single-02",
     component: <UserProfile />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -119,6 +123,7 @@ var routes = [
     rtlName: "قائمة الجدول",
     icon: "tim-icons icon-puzzle-10",
     component: <TableList />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -127,6 +132,7 @@ var routes = [
     rtlName: "طباعة",
     icon: "tim-icons icon-align-center",
     component: <Typography />,
+    redirect: true,
     layout: "/admin",
   },
   {
@@ -135,6 +141,7 @@ var routes = [
     rtlName: "ار تي ال",
     icon: "tim-icons icon-world",
     component: <Rtl />,
+    redirect: true,
     layout: "/rtl",
   },
 ];
