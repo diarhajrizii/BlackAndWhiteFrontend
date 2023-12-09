@@ -148,6 +148,9 @@ const ProductList = () => {
             .map((product, index) => (
               <div key={index} className="grid-item">
                 <Row className="parentRow">
+                  <Col className="codeColumn text-center" md="12">
+                    {product.code}
+                  </Col>
                   <Col className="colorColumn" md="9">
                     {product.color}
                   </Col>
@@ -157,22 +160,16 @@ const ProductList = () => {
                   <Col className="barcode-container" md="12">
                     <Barcode
                       value={product.barcode}
-                      text={product.code}
+                      text={product.price + "€"}
                       fontOptions="bold italic"
                       width={0.8}
                       height={30}
                       format="CODE128"
-                      displayValue={false}
+                      // displayValue={false}
                       font="monospace"
                       textAlign="center"
                       textPosition="bottom"
                     />
-                  </Col>
-                  <Col className="codeColumn" md="9">
-                    {product.code}
-                  </Col>
-                  <Col className="priceColumn" md="2">
-                    {product.price}€
                   </Col>
                 </Row>
               </div>

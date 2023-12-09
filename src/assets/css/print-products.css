@@ -21,14 +21,15 @@
     margin-bottom: 8px;
   }
   .numberColumn {
-    text-align: center;
-    border: 1px solid black;
-    color: black;
-    margin: 1px;
-    font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    margin: 1px;
+    color: black;
+    font-size: 20px;
+    font-weight: 800;
+    border: 1px solid black;
   }
   .colorColumn {
     text-align: start;
@@ -47,7 +48,7 @@
   .codeColumn {
     text-align: start;
     color: black;
-    font-size: x-large;
+    font-size: xx-large;
     font-weight: bold;
   }
 
