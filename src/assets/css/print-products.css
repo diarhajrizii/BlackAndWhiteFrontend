@@ -1,0 +1,80 @@
+@media print {
+  .page {
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    display: block !important;
+  }
+  body {
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: white !important;
+  }
+  .grid-item .row div {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .numberColumn {
+    text-align: center;
+    border: 1px solid black;
+    margin: 1px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colorColumn {
+    text-align: start;
+    color: black;
+    font-size: x-large;
+    font-weight: bold;
+    color: black;
+  }
+  .priceColumn {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: black;
+  }
+  .codeColumn {
+    text-align: start;
+    color: black;
+    font-size: x-large;
+    font-weight: bold;
+  }
+
+  .grid-item {
+    width: calc(33.333% - 1px);
+    height: calc(373mm / 7 - 1px);
+    border: 1px solid black;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    page-break-inside: avoid;
+  }
+
+  .barcode-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .parentRow {
+    width: 100%;
+    text-align: center;
+  }
+  .barcode-container rect {
+  }
+}
+.productsTable .price {
+  text-align: end;
+}
