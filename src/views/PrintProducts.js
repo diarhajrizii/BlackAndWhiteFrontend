@@ -14,6 +14,7 @@ import Barcode from "react-barcode"; // Import the Barcode component
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [printProducts, setPrintProducts] = useState([]);
   const columns = ["id", "brand", "color", "number", "type", "code", "price"];
   const tableHeaders = [
     "ID",
@@ -31,8 +32,12 @@ const ProductList = () => {
         const response = await fetch("/api/v1/products/products");
         if (response.ok) {
           const responseData = await response.json();
-          const fetchedProducts = responseData.data.data;
+          const fetchedProducts = responseData.data.data.map((product) => ({
+            ...product,
+            selected: true,
+          }));
           setProducts(fetchedProducts);
+          setPrintProducts(fetchedProducts);
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -44,6 +49,25 @@ const ProductList = () => {
 
     fetchProducts();
   }, []);
+
+  const handleProductSelection = (productId) => {
+    const updatedPrintProducts = printProducts.map((product) => {
+      if (product.id === productId) {
+        return { ...product, selected: !product.selected };
+      }
+      return product;
+    });
+    setPrintProducts(updatedPrintProducts);
+  };
+
+  const handleAllProductSelection = () => {
+    const allSelected = printProducts.every((product) => product.selected);
+    const updatedPrintProducts = printProducts.map((product) => ({
+      ...product,
+      selected: !allSelected,
+    }));
+    setPrintProducts(updatedPrintProducts);
+  };
 
   const handlePrint = () => {
     const printContents = document.getElementById("print-section").innerHTML;
@@ -83,6 +107,15 @@ const ProductList = () => {
                   {tableHeaders.map((header, index) => (
                     <th key={index}>{header}</th>
                   ))}
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={printProducts.every(
+                        (product) => product.selected
+                      )}
+                      onChange={handleAllProductSelection}
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -93,19 +126,16 @@ const ProductList = () => {
                         {product[key]}
                       </td>
                     ))}
-                    {/* <td align="right" key={index}>
-                      <Button color="link" onClick={() => openEditModal(item)}>
-                        <i className="tim-icons icon-pencil" />
-                        <span className="d-lg-none d-md-block">Edit</span>
-                      </Button>
-                      <Button
-                        color="link"
-                        onClick={() => openDeleteModal(item)}
-                      >
-                        <i className="tim-icons icon-trash-simple" />
-                        <span className="d-lg-none d-md-block">Delete</span>
-                      </Button>
-                    </td> */}
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={
+                          printProducts.find((p) => p.id === product.id)
+                            ?.selected
+                        }
+                        onChange={() => handleProductSelection(product.id)}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -113,38 +143,40 @@ const ProductList = () => {
           </CardBody>
         </Card>
         <div className="page d-none" id="print-section">
-          {products.map((product, index) => (
-            <div key={index} className="grid-item">
-              <Row className="parentRow">
-                <Col className="colorColumn" md="9">
-                  {product.color}
-                </Col>
-                <Col className="numberColumn" md="2">
-                  {product.number}
-                </Col>
-                <Col className="barcode-container" md="12">
-                  <Barcode
-                    value={product.barcode}
-                    text={product.code}
-                    fontOptions="bold italic"
-                    width={0.8}
-                    height={30}
-                    format="CODE128"
-                    displayValue={false}
-                    font="monospace"
-                    textAlign="center"
-                    textPosition="bottom"
-                  />
-                </Col>
-                <Col className="codeColumn" md="9">
-                  {product.code}
-                </Col>
-                <Col className="priceColumn" md="2">
-                  {product.price}€
-                </Col>
-              </Row>
-            </div>
-          ))}
+          {printProducts
+            .filter((product) => product.selected)
+            .map((product, index) => (
+              <div key={index} className="grid-item">
+                <Row className="parentRow">
+                  <Col className="colorColumn" md="9">
+                    {product.color}
+                  </Col>
+                  <Col className="numberColumn" md="2">
+                    {product.number}
+                  </Col>
+                  <Col className="barcode-container" md="12">
+                    <Barcode
+                      value={product.barcode}
+                      text={product.code}
+                      fontOptions="bold italic"
+                      width={0.8}
+                      height={30}
+                      format="CODE128"
+                      displayValue={false}
+                      font="monospace"
+                      textAlign="center"
+                      textPosition="bottom"
+                    />
+                  </Col>
+                  <Col className="codeColumn" md="9">
+                    {product.code}
+                  </Col>
+                  <Col className="priceColumn" md="2">
+                    {product.price}€
+                  </Col>
+                </Row>
+              </div>
+            ))}
         </div>
       </div>
     </>
