@@ -9,12 +9,25 @@ import {
   Col,
   Row,
   Table,
+  Label,
+  Input,
+  FormGroup,
+  Form,
 } from "reactstrap";
 import Barcode from "react-barcode"; // Import the Barcode component
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [printProducts, setPrintProducts] = useState([]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [codeFilter, setCodeFilter] = useState(""); // State for code filter
+  const [brandFilter, setBrandFilter] = useState(""); // State for brand filter
+  const [filteredProducts, setFilteredProducts] = useState([]); // State to store filtered products
   const columns = ["id", "brand", "color", "number", "type", "code", "price"];
   const tableHeaders = [
     "ID",
@@ -27,28 +40,27 @@ const ProductList = () => {
   ];
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/api/v1/products/products");
-        if (response.ok) {
-          const responseData = await response.json();
-          const fetchedProducts = responseData.data.data.map((product) => ({
-            ...product,
-            selected: true,
-          }));
-          setProducts(fetchedProducts);
-          setPrintProducts(fetchedProducts);
-        } else {
-          throw new Error("Failed to fetch data");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Handle errors or show a message to the user
-      }
-    };
-
     fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(`/api/v1/products/products`);
+      if (response.ok) {
+        const responseData = await response.json();
+        const fetchedProducts = responseData.data.data.map((product) => ({
+          ...product,
+          selected: true,
+        }));
+        setProducts(fetchedProducts);
+      } else {
+        throw new Error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle errors or show a message to the user
+    }
+  };
 
   const handleProductSelection = (productId) => {
     const updatedPrintProducts = printProducts.map((product) => {
@@ -60,6 +72,22 @@ const ProductList = () => {
     setPrintProducts(updatedPrintProducts);
   };
 
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleEndDateChange = (event) => {
+    setEndDate(event.target.value);
+  };
+
+  const handleCodeFilterChange = (event) => {
+    setCodeFilter(event.target.value);
+  };
+
+  const handleBrandFilterChange = (event) => {
+    setBrandFilter(event.target.value);
+  };
+
   const handleAllProductSelection = () => {
     const allSelected = printProducts.every((product) => product.selected);
     const updatedPrintProducts = printProducts.map((product) => ({
@@ -67,6 +95,38 @@ const ProductList = () => {
       selected: !allSelected,
     }));
     setPrintProducts(updatedPrintProducts);
+  };
+  const selectAll = () => {
+    setFilteredProducts(products);
+    setPrintProducts(products);
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const startDateObject = startDate ? new Date(startDate) : null;
+    const endDateObject = endDate ? new Date(endDate) : null;
+
+    const filtered = products.filter((product) => {
+      const productDate = new Date(product.date);
+      const startDateCondition =
+        !startDateObject || productDate >= startDateObject;
+      const endDateCondition = !endDateObject || productDate <= endDateObject;
+      const codeCondition =
+        !codeFilter ||
+        product.code.toLowerCase().includes(codeFilter.toLowerCase());
+      const brandCondition =
+        !brandFilter ||
+        product.brand.toLowerCase().includes(brandFilter.toLowerCase());
+
+      return (
+        startDateCondition &&
+        endDateCondition &&
+        codeCondition &&
+        brandCondition
+      );
+    });
+
+    setFilteredProducts(filtered);
+    setPrintProducts(filtered);
   };
 
   const handlePrint = () => {
@@ -98,6 +158,64 @@ const ProductList = () => {
                   Print All
                 </Button>
               </Col>
+              <Col sm="12">
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                    <Col sm="6">
+                      <FormGroup>
+                        <Label for="startDate">Start Date</Label>
+                        <Input
+                          type="date"
+                          id="startDate"
+                          value={startDate}
+                          onChange={handleStartDateChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm="6">
+                      <FormGroup>
+                        <Label for="endDate">End Date</Label>
+                        <Input
+                          type="date"
+                          id="endDate"
+                          value={endDate}
+                          onChange={handleEndDateChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm="6">
+                      <FormGroup>
+                        <Label for="codeFilter">Code Filter</Label>
+                        <Input
+                          type="text"
+                          id="codeFilter"
+                          value={codeFilter}
+                          onChange={handleCodeFilterChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm="6">
+                      <FormGroup>
+                        <Label for="brandFilter">Brand Filter</Label>
+                        <Input
+                          type="text"
+                          id="brandFilter"
+                          value={brandFilter}
+                          onChange={handleBrandFilterChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm="12" style={{ textAlign: "end" }}>
+                      <Button color="secondary" size="sm" onClick={selectAll}>
+                        Show All
+                      </Button>
+                      <Button size="sm" color="primary" type="submit">
+                        Filter
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+              </Col>
             </Row>
           </CardHeader>
           <CardBody>
@@ -119,7 +237,7 @@ const ProductList = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, index) => (
+                {filteredProducts.map((product, index) => (
                   <tr key={index}>
                     {columns.map((key, index) => (
                       <td className={key} key={index}>
