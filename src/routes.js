@@ -26,6 +26,7 @@ import UserProfile from "views/UserProfile.js";
 import AddProducts from "views/AddProducts.js";
 import CMSPanel from "views/CmsPanels.js";
 import ProductList from "views/PrintProducts";
+import Products from "views/ProductsList";
 
 var routes = [
   {
@@ -49,8 +50,8 @@ var routes = [
     name: "Products",
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-bag-16",
-    component: <Dashboard />,
-    layout: "#",
+    component: <Products />,
+    layout: "/admin",
     // subItems: [
     //   {
     //     path: "/add/products",
