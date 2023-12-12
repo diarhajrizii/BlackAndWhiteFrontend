@@ -21,6 +21,8 @@ import {
   editColorData,
   editNumberData,
   editTypeData,
+  saveLocationsData,
+  editLocationData,
 } from "../api.js"; // Import API functions
 import Alert from "../components/Alert/alert";
 
@@ -55,6 +57,9 @@ const AddItemModal = ({
       break;
     case "types":
       modalTitle = "Add New Type";
+      break;
+    case "locations":
+      modalTitle = "Add New Location";
       break;
     default:
       modalTitle = "";
@@ -107,6 +112,9 @@ const AddItemModal = ({
           case "types":
             data = await saveTypeData(formData);
             break;
+          case "locations":
+            data = await saveLocationsData(formData);
+            break;
           default:
             break;
         }
@@ -125,6 +133,9 @@ const AddItemModal = ({
             break;
           case "types":
             data = await editTypeData(formData);
+            break;
+          case "locations":
+            data = await editLocationData(formData);
             break;
           default:
             break;
@@ -232,6 +243,21 @@ const AddItemModal = ({
                   id="type"
                   value={editItemData.type || ""}
                   placeholder="Enter Type"
+                  onChange={handleInputChange}
+                />
+              </FormGroup>
+            </>
+          )}
+          {itemType === "locations" && (
+            <>
+              <FormGroup>
+                <Label for="name">Name</Label>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={editItemData.name || ""}
+                  placeholder="Enter Name"
                   onChange={handleInputChange}
                 />
               </FormGroup>

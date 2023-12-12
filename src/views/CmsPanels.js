@@ -75,6 +75,8 @@ function CMSPanel() {
         return ["ID", "Number", ""];
       case "types":
         return ["ID", "Type", ""];
+      case "Locations":
+        return ["ID", "Locations", ""];
       default:
         return [];
     }
@@ -109,20 +111,22 @@ function CMSPanel() {
                 className="btn-group-toggle float-right"
                 data-toggle="buttons"
               >
-                {["brands", "colors", "numbers", "types"].map((button) => (
-                  <Button
-                    key={button}
-                    tag="label"
-                    color="info"
-                    size="sm"
-                    className={classNames("btn-simple", {
-                      active: activeButton === button,
-                    })}
-                    onClick={() => handleButtonClick(button)}
-                  >
-                    {button.charAt(0).toUpperCase() + button.slice(1)}
-                  </Button>
-                ))}
+                {["brands", "colors", "numbers", "types", "locations"].map(
+                  (button) => (
+                    <Button
+                      key={button}
+                      tag="label"
+                      color="info"
+                      size="sm"
+                      className={classNames("btn-simple", {
+                        active: activeButton === button,
+                      })}
+                      onClick={() => handleButtonClick(button)}
+                    >
+                      {button.charAt(0).toUpperCase() + button.slice(1)}
+                    </Button>
+                  )
+                )}
               </ButtonGroup>
             </Col>
             <Col sm="12">
