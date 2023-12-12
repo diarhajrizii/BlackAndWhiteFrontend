@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -14,11 +14,36 @@ import {
   Form,
 } from "reactstrap";
 
+const useBarcodeScanner = (callback) => {
+  useEffect(() => {
+    let scannedCode = "";
+
+    const handleBarcodeScanner = (event) => {
+      if (event.key === "Enter" && scannedCode.length > 0) {
+        console.log("Scanned barcode:", scannedCode);
+
+        if (typeof callback === "function") {
+          callback(scannedCode);
+        }
+
+        scannedCode = "";
+      } else if (event.key !== "Enter" && event.key.length === 1) {
+        scannedCode += event.key;
+      }
+    };
+
+    document.addEventListener("keydown", handleBarcodeScanner);
+    return () => {
+      document.removeEventListener("keydown", handleBarcodeScanner);
+    };
+  }, [callback]);
+};
+
 const ProductList = () => {
   const [product, setProduct] = useState(null);
   const [barcode, setBarcode] = useState("");
   console.log(barcode);
-  const handleBarcodeScan = async (e) => {
+  const handleBarcodeScanner = async (e) => {
     try {
       const response = await fetch(`/api/v1/products/products/${barcode}`);
       if (response.ok) {
@@ -32,6 +57,12 @@ const ProductList = () => {
       // Handle errors or show a message to the user
     }
   };
+
+  const handleBarcodeScan = (scannedValue) => {
+    setBarcode(scannedValue);
+  };
+
+  useBarcodeScanner(handleBarcodeScan);
 
   return (
     <div className="content">

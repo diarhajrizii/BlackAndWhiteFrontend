@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../assets/css/print-products.css"; // Import the CSS module
 import {
   Button,
@@ -39,6 +39,31 @@ const ProductList = () => {
     "Price",
   ];
 
+  const useBarcodeScanner = (callback) => {
+    useEffect(() => {
+      let scannedCode = "";
+
+      const handleBarcodeScanner = (event) => {
+        if (event.key === "Enter" && scannedCode.length > 0) {
+          console.log("Scanned barcode:", scannedCode);
+
+          if (typeof callback === "function") {
+            callback(scannedCode);
+          }
+
+          scannedCode = "";
+        } else if (event.key !== "Enter" && event.key.length === 1) {
+          scannedCode += event.key;
+        }
+      };
+
+      document.addEventListener("keydown", handleBarcodeScanner);
+
+      return () => {
+        document.removeEventListener("keydown", handleBarcodeScanner);
+      };
+    }, [callback]);
+  };
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -88,6 +113,17 @@ const ProductList = () => {
     setBrandFilter(event.target.value);
   };
 
+  const handleBarcodeData = (filtered) => {
+    // Check if items already exist based on unique identifiers (e.g., ID)
+    const existingIds = filteredProducts.map((item) => item.id);
+    const newItems = filtered.filter((item) => !existingIds.includes(item.id));
+
+    // Merge new items into filteredProducts
+    const updatedFilteredProducts = [...filteredProducts, ...newItems];
+    setFilteredProducts(updatedFilteredProducts);
+    setPrintProducts(updatedFilteredProducts);
+  };
+
   const handleAllProductSelection = () => {
     const allSelected = printProducts.every((product) => product.selected);
     const updatedPrintProducts = printProducts.map((product) => ({
@@ -100,8 +136,23 @@ const ProductList = () => {
     setFilteredProducts(products);
     setPrintProducts(products);
   };
+  const handleBarcodeScan = (scannedValue) => {
+    const syntheticEvent = {
+      preventDefault: () => {}, // Add event methods you need to use
+      target: {
+        value: scannedValue, // Pass scanned value if needed
+        barcode: scannedValue,
+      },
+    };
+
+    handleSubmit(syntheticEvent);
+  };
+
+  useBarcodeScanner(handleBarcodeScan);
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    const scannedCode = event.target.barcode;
     const startDateObject = startDate ? new Date(startDate) : null;
     const endDateObject = endDate ? new Date(endDate) : null;
 
@@ -110,13 +161,17 @@ const ProductList = () => {
       const startDateCondition =
         !startDateObject || productDate >= startDateObject;
       const endDateCondition = !endDateObject || productDate <= endDateObject;
+
       const codeCondition =
         !codeFilter ||
         product.code.toLowerCase().includes(codeFilter.toLowerCase());
       const brandCondition =
         !brandFilter ||
         product.brand.toLowerCase().includes(brandFilter.toLowerCase());
-
+      if (scannedCode) {
+        const barcodeCondition = scannedCode === product.barcode;
+        return barcodeCondition;
+      }
       return (
         startDateCondition &&
         endDateCondition &&
@@ -127,6 +182,7 @@ const ProductList = () => {
 
     setFilteredProducts(filtered);
     setPrintProducts(filtered);
+    handleBarcodeData(filtered);
   };
 
   const handlePrint = () => {
@@ -383,9 +439,7 @@ const ProductList = () => {
                         width={0.8}
                         height={20}
                         format="CODE128"
-                        fontSize={"15px"}
-                        // displayValue={false}
-                        // lineColor="black"
+                        fontSize={parseInt("15px", 10)}
                         background="transparent"
                         font="monospace"
                         textAlign="center"
