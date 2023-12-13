@@ -15,9 +15,13 @@ import {
   Form,
 } from "reactstrap";
 import Barcode from "react-barcode";
+import TransferItemsModal from "../modals/transferModal";
+import NotificationAlert from "react-notification-alert";
+import Alert from "../components/Alert/alert";
 
 const ProductList = () => {
   // State declarations
+  const notificationAlertRef = React.useRef(null);
   const [products, setProducts] = useState([]);
   const [printProducts, setPrintProducts] = useState([]);
   const [startDate, setStartDate] = useState(
@@ -29,6 +33,8 @@ const ProductList = () => {
   const [codeFilter, setCodeFilter] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [locationsData, setLocationsData] = useState([]);
 
   // Constants
   const columns = ["id", "brand", "color", "number", "type", "code", "price"];
@@ -45,6 +51,7 @@ const ProductList = () => {
   // Use Effect to fetch products
   useEffect(() => {
     fetchProducts();
+    fetchLocations();
   }, []);
 
   // Fetch products function
@@ -66,6 +73,30 @@ const ProductList = () => {
       // Handle errors or show a message to the user
     }
   };
+  // Fetch products function
+  const fetchLocations = async () => {
+    try {
+      const response = await fetch(`/api/v1/panels/locations`);
+      if (response.ok) {
+        const { data: responseData } = await response.json();
+        setLocationsData(responseData.data);
+      } else {
+        throw new Error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle errors or show a message to the user
+    }
+  };
+
+  const openTransferModal = () => {
+    if (filteredProducts.length !== 0) {
+      setTransferModalOpen(true);
+    } else {
+      const options = Alert(400, "Please select a product to transfer");
+      notificationAlertRef.current.notificationAlert(options);
+    }
+  };
 
   // Handlers
   const handleProductSelection = (productId) => {
@@ -76,6 +107,7 @@ const ProductList = () => {
       return product;
     });
     setPrintProducts(updatedPrintProducts);
+    setFilteredProducts(updatedPrintProducts);
   };
 
   const handleStartDateChange = (event) => {
@@ -111,6 +143,7 @@ const ProductList = () => {
       ...product,
       selected: !allSelected,
     }));
+    setFilteredProducts(updatedPrintProducts);
     setPrintProducts(updatedPrintProducts);
   };
 
@@ -307,6 +340,9 @@ const ProductList = () => {
   return (
     <>
       <div className="content">
+        <div className="react-notification-alert-container">
+          <NotificationAlert ref={notificationAlertRef} />
+        </div>
         <Card>
           <CardHeader>
             <Row>
@@ -378,8 +414,12 @@ const ProductList = () => {
                       <Button size="sm" color="primary" type="submit">
                         Filter
                       </Button>
-                      <Button color="secondary" size="sm">
-                        Transfer Products
+                      <Button
+                        color="success"
+                        size="sm"
+                        onClick={() => openTransferModal()}
+                      >
+                        Transfer
                       </Button>
                     </Col>
                   </Row>
@@ -465,6 +505,14 @@ const ProductList = () => {
               ))}
           </div>
         </div>
+        <TransferItemsModal
+          modalOpen={transferModalOpen}
+          notificationAlertRef={notificationAlertRef}
+          toggleModal={() => setTransferModalOpen(!transferModalOpen)}
+          productsData={printProducts}
+          locationsData={locationsData}
+          setFilteredProducts={setFilteredProducts}
+        />
       </div>
     </>
   );

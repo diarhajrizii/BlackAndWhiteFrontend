@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 // api.js
 
 const saveColorData = async (colorData) => {
@@ -124,6 +125,27 @@ const deleteItem = async (endpoint, data) => {
   }
 };
 
+const transferProducts = async (ids, location) => {
+  try {
+    console.log({ location });
+    const response = await fetch(`/api/v1/products/transfer`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids, location }),
+    });
+    const responseData = await response.json();
+    if (!responseData.success)
+      throw { message: "Error while transferring products" };
+    // Handle response data if needed
+    return responseData; // Return response data if needed
+  } catch (error) {
+    console.error(`Error saving data:`, error);
+    return { success: false, message: error.message };
+  }
+};
+
 // Example usage:
 const editColorData = async (colorData) => {
   return await saveData("color", colorData);
@@ -157,4 +179,5 @@ export {
   deleteItem,
   saveLocationsData,
   editLocationData,
+  transferProducts,
 };
