@@ -408,18 +408,18 @@ const ProductList = () => {
                       </FormGroup>
                     </Col>
                     <Col sm="12" style={{ textAlign: "end" }}>
-                      <Button color="secondary" size="sm" onClick={selectAll}>
-                        Show All
-                      </Button>
-                      <Button size="sm" color="primary" type="submit">
-                        Filter
-                      </Button>
                       <Button
                         color="success"
                         size="sm"
                         onClick={() => openTransferModal()}
                       >
                         Transfer
+                      </Button>
+                      <Button color="secondary" size="sm" onClick={selectAll}>
+                        Show All
+                      </Button>
+                      <Button size="sm" color="primary" type="submit">
+                        Filter
                       </Button>
                     </Col>
                   </Row>
