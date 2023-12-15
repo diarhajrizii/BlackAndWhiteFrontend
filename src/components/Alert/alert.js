@@ -35,3 +35,52 @@ function Alert(color, message) {
 }
 
 export default Alert;
+// TODO CHECK THIS FUNCTION
+
+// import React, { useEffect, useState } from "react";
+
+// const Notification = ({ color, message, notificationAlertRef }) => {
+//   useEffect(() => {
+//     if (!message || !notificationAlertRef?.current) return;
+
+//     let type;
+//     switch (color) {
+//       case "primary":
+//         type = "primary";
+//         break;
+//       case "success":
+//         type = "success";
+//         break;
+//       case "danger":
+//         type = "danger";
+//         break;
+//       case "warning":
+//         type = "warning";
+//         break;
+//       case "info":
+//         type = "info";
+//         break;
+//       default:
+//         type = "info";
+//         break;
+//     }
+
+//     const options = {
+//       place: "tr",
+//       message: (
+//         <div>
+//           <div>{message}</div>
+//         </div>
+//       ),
+//       type: type,
+//       icon: "tim-icons icon-bell-55",
+//       autoDismiss: 7,
+//     };
+
+//     notificationAlertRef.current.notificationAlert(options);
+//   }, [message, color, notificationAlertRef]);
+
+//   return null;
+// };
+
+// export default Notification;
