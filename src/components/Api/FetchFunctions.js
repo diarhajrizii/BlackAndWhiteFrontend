@@ -32,3 +32,17 @@ export const fetchLocations = async () => {
     throw new Error("Failed to fetch locations");
   }
 };
+export const fetchSalesData = async () => {
+  try {
+    const response = await fetch("/api/v1/transactions");
+    if (response.ok) {
+      const responseData = await response.json();
+      return responseData.data.data;
+    } else {
+      throw new Error("Failed to fetch sales data");
+    }
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    // Handle errors or show a message to the user
+  }
+};

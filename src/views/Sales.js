@@ -13,7 +13,11 @@ import {
   Label,
   CardTitle,
 } from "reactstrap";
-import Barcode from "react-barcode";
+import { fetchProducts } from "components/Api/FetchFunctions";
+import { fetchSalesData } from "components/Api/FetchFunctions";
+import BarcodeScanner from "components/Barcode/ScannerCode";
+import FilterForm from "components/Filters/FilterForms";
+import SaleModal from "modals/SaleModal";
 
 const SalesPage = () => {
   // States for product search and sales data
@@ -60,28 +64,22 @@ const SalesPage = () => {
     "Bank Name",
   ];
 
+  const [selectedProducts, setSelectedProducts] = useState([]); // State to store selected products
+  const [showSaleModal, setShowSaleModal] = useState(false); // State to control the sale modal visibility
   // Fetch products function (similar to ProductList fetchProducts)
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/v1/products/products");
-        if (response.ok) {
-          const responseData = await response.json();
-          const fetchedProducts = responseData.data.data.map((product) => ({
-            ...product,
-            selected: false,
-          }));
-          setProducts(fetchedProducts);
-        } else {
-          throw new Error("Failed to fetch products");
-        }
+        const fetchedProducts = await fetchProducts();
+        const fetchedSalesData = await fetchSalesData();
+        setProducts(fetchedProducts);
+        setSales(fetchedSalesData);
       } catch (error) {
-        console.error("Error fetching products:", error);
-        // Handle errors or show a message to the user
+        console.error(error);
       }
     };
-    fetchProducts();
-    fetchSalesData();
+
+    fetchData();
   }, []);
 
   // Handlers
@@ -112,7 +110,8 @@ const SalesPage = () => {
     const updatedFilteredProducts = [...filteredProducts, ...newItems];
     setFilteredProducts(updatedFilteredProducts);
   };
-  const handleBarcodeScan = (scannedValue) => {
+
+  const handleBarcodeScanned = (scannedValue) => {
     const syntheticEvent = {
       preventDefault: () => {}, // Add event methods you need to use
       target: {
@@ -123,34 +122,6 @@ const SalesPage = () => {
 
     handleSubmit(syntheticEvent);
   };
-
-  const useBarcodeScanner = (callback) => {
-    useEffect(() => {
-      let scannedCode = "";
-
-      const handleBarcodeScanner = (event) => {
-        if (event.key === "Enter" && scannedCode.length > 0) {
-          console.log("Scanned barcode:", scannedCode);
-
-          if (typeof callback === "function") {
-            callback(scannedCode);
-          }
-
-          scannedCode = "";
-        } else if (event.key !== "Enter" && event.key.length === 1) {
-          scannedCode += event.key;
-        }
-      };
-
-      document.addEventListener("keydown", handleBarcodeScanner);
-
-      return () => {
-        document.removeEventListener("keydown", handleBarcodeScanner);
-      };
-    }, [callback]);
-  };
-
-  useBarcodeScanner(handleBarcodeScan);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -184,32 +155,68 @@ const SalesPage = () => {
     }));
     setFilteredProducts(updatedPrintProducts);
   };
+  const handleSale = () => {
+    const selected = filteredProducts.filter((product) => product.selected);
+    setSelectedProducts(selected);
+    setShowSaleModal(true);
+  };
 
-  // Fetch sales data from "/api/v1/transactions"
-  const fetchSalesData = async () => {
+  const sellProducts = async (saleData) => {
     try {
-      const response = await fetch("/api/v1/transactions");
+      const response = await fetch("/api/v1/products/products", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(saleData),
+      });
+
       if (response.ok) {
-        const responseData = await response.json();
-        setSales(responseData.data.data); // Assuming the response provides an array of sales data
+        const data = await response.json();
+        console.log("Sale Data:", data);
+        setShowSaleModal(false); // Close the modal after handling the sale data
       } else {
-        throw new Error("Failed to fetch sales data");
+        throw new Error("Failed to sell products");
       }
     } catch (error) {
-      console.error("Error fetching sales data:", error);
-      // Handle errors or show a message to the user
+      console.error("Error selling products:", error);
+      // Handle error scenario, e.g., display an error message to the user
     }
   };
 
-  // Function to handle the sale button click
-  const handleSale = () => {
-    // Logic for sale operation
-    // ...
-  };
+  // ... (existing code)
 
   return (
     <>
       <div className="content">
+        <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
+        <Card>
+          <CardHeader>
+            <h5 className="card-category">Sales</h5>
+          </CardHeader>
+          <CardBody>
+            <Table className="tablesorter productsTable" responsive>
+              <thead className="text-primary">
+                <tr>
+                  {salesTableHeaders.map((header, index) => (
+                    <th key={index}>{header}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sales.map((sale, index) => (
+                  <tr key={index}>
+                    {salesColumns.map((key, index) => (
+                      <td className={key} key={index}>
+                        {sale[key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
         <Card>
           <CardHeader>
             <Row>
@@ -218,37 +225,14 @@ const SalesPage = () => {
                 <CardTitle tag="h2">Products</CardTitle>
               </Col>
               <Col sm="12">
-                <Form onSubmit={handleSubmit}>
-                  <Row>
-                    <Col sm="6">
-                      <FormGroup>
-                        <Label for="codeFilter">Code Filter</Label>
-                        <Input
-                          type="text"
-                          id="codeFilter"
-                          value={codeFilter}
-                          onChange={handleCodeFilterChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col sm="6">
-                      <FormGroup>
-                        <Label for="brandFilter">Brand Filter</Label>
-                        <Input
-                          type="text"
-                          id="brandFilter"
-                          value={brandFilter}
-                          onChange={handleBrandFilterChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col sm="12" style={{ textAlign: "end" }}>
-                      <Button size="sm" color="primary" type="submit">
-                        Filter
-                      </Button>
-                    </Col>
-                  </Row>
-                </Form>
+                <FilterForm
+                  codeFilter={codeFilter}
+                  brandFilter={brandFilter}
+                  handleCodeFilterChange={handleCodeFilterChange}
+                  handleBrandFilterChange={handleBrandFilterChange}
+                  handleSubmit={handleSubmit}
+                  handleSale={handleSale}
+                />
               </Col>
             </Row>
           </CardHeader>
@@ -294,31 +278,16 @@ const SalesPage = () => {
             </Table>
           </CardBody>
         </Card>
-        <Card>
-          <CardHeader>
-            <h5 className="card-category">Sales</h5>
-          </CardHeader>
-          <CardBody>
-            <Table>
-              <tr>
-                {salesTableHeaders.map((header, index) => (
-                  <th key={index}>{header}</th>
-                ))}
-              </tr>
-              <tbody>
-                {sales.map((sale) => (
-                  <tr key={sale.transaction_id}>
-                    {salesColumns.map((key, index) => (
-                      <td className={key} key={index}>
-                        {sale[key]}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </CardBody>
-        </Card>
+
+        {showSaleModal && (
+          <SaleModal
+            selectedProducts={selectedProducts}
+            // banks={banks} // Pass banks data if available
+            toggle={() => setShowSaleModal(!showSaleModal)}
+            sellProducts={sellProducts}
+            setSales={setSales}
+          />
+        )}
       </div>
     </>
   );

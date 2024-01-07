@@ -13,31 +13,37 @@ const FilterForm = ({
   handleSubmit,
   openTransferModal,
   selectAll,
+  handleSale,
 }) => (
   <Form onSubmit={handleSubmit}>
+    {startDate !== undefined && endDate !== undefined && (
+      <Row>
+        <Col sm="6">
+          <FormGroup>
+            <Label for="startDate">Start Date</Label>
+            <Input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col sm="6">
+          <FormGroup>
+            <Label for="endDate">End Date</Label>
+            <Input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+          </FormGroup>
+        </Col>
+      </Row>
+    )}
+
     <Row>
-      <Col sm="6">
-        <FormGroup>
-          <Label for="startDate">Start Date</Label>
-          <Input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={handleStartDateChange}
-          />
-        </FormGroup>
-      </Col>
-      <Col sm="6">
-        <FormGroup>
-          <Label for="endDate">End Date</Label>
-          <Input
-            type="date"
-            id="endDate"
-            value={endDate}
-            onChange={handleEndDateChange}
-          />
-        </FormGroup>
-      </Col>
       <Col sm="6">
         <FormGroup>
           <Label for="codeFilter">Code Filter</Label>
@@ -61,12 +67,22 @@ const FilterForm = ({
         </FormGroup>
       </Col>
       <Col sm="12" style={{ textAlign: "end" }}>
-        <Button color="success" size="sm" onClick={openTransferModal}>
-          Transfer
-        </Button>
-        <Button color="secondary" size="sm" onClick={selectAll}>
-          Show All
-        </Button>
+        {openTransferModal !== undefined && (
+          <Button color="success" size="sm" onClick={openTransferModal}>
+            Transfer
+          </Button>
+        )}
+        {selectAll !== undefined && (
+          <Button color="secondary" size="sm" onClick={selectAll}>
+            Show All
+          </Button>
+        )}
+        {handleSale !== undefined && (
+          <Button size="sm" color="success" onClick={handleSale}>
+            Sale
+          </Button>
+        )}
+
         <Button size="sm" color="primary" type="submit">
           Filter
         </Button>

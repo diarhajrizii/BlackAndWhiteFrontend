@@ -15,4 +15,7 @@
 .add-item-modal .modal-title {
   color: white !important;
 }
+.sale-item {
+  margin-bottom: 15px;
+}
 /* .form-group; */

@@ -1,4 +1,3 @@
-/* eslint-disable no-throw-literal */
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -38,13 +37,15 @@ async function fetchPanelData(endpoint) {
 
 function AddProducts() {
   const notificationAlertRef = React.useRef(null);
-  const [code, setCode] = useState("");
-  const [brand, setBrand] = useState(0);
-  const [type, setType] = useState(0);
-  const [color, setColor] = useState(0);
-  const [stockPrice, setStockPrice] = useState(0);
-  const [importPrice, setImportPrice] = useState(0);
-  const [sizes, setSizes] = useState({});
+  const [formData, setFormData] = useState({
+    code: "",
+    brand: 0,
+    type: 0,
+    color: 0,
+    stockPrice: 0,
+    importPrice: 0,
+    sizes: {},
+  });
   const [brandOptions, setBrandOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
   const [typeOptions, setTypeOptions] = useState([]);
@@ -62,15 +63,15 @@ function AddProducts() {
         setBrandOptions(brandData.data.data);
         setColorOptions(colorData.data.data);
         setTypeOptions(typeData.data.data);
-        setBrand(brandData.data.data[0]?.id || 0);
-        setType(colorData.data.data[0]?.id || 0);
-        setColor(typeData.data.data[0]?.id || 0);
-
-        const initialSizes = {};
-        numberData.data.data.forEach((number) => {
-          initialSizes[number.number] = 0;
-        });
-        setSizes(initialSizes);
+        setFormData((prevData) => ({
+          ...prevData,
+          brand: brandData.data.data[0]?.id || 0,
+          type: colorData.data.data[0]?.id || 0,
+          color: typeData.data.data[0]?.id || 0,
+          sizes: Object.fromEntries(
+            numberData.data.data.map((number) => [number.number, 0])
+          ),
+        }));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -78,67 +79,48 @@ function AddProducts() {
     fetchDataFromAPIs();
   }, []);
 
-  const handleCodeChange = (e) => {
-    setCode(e.target.value);
-  };
-
-  const handleBrandChange = (e) => {
-    setBrand(e.target.value);
-  };
-
-  const handleTypeChange = (e) => {
-    setType(e.target.value);
-  };
-
-  const handleColorChange = (e) => {
-    setColor(e.target.value);
-  };
-
-  const handleStockPriceChange = (e) => {
-    setStockPrice(parseInt(e.target.value));
-  };
-
-  const handleImportPriceChange = (e) => {
-    setImportPrice(parseInt(e.target.value));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === "code" ? value : parseInt(value, 10),
+    }));
   };
 
   const handleSizeQuantityChange = (e, size) => {
-    const newSize = { ...sizes, [size]: parseInt(e.target.value, 10) };
-    setSizes(newSize);
+    const newSize = { ...formData.sizes, [size]: parseInt(e.target.value, 10) };
+    setFormData((prevData) => ({
+      ...prevData,
+      sizes: newSize,
+    }));
   };
 
   const handleSave = async () => {
     try {
-      const sizesData = Object.entries(sizes).map(([size, quantity]) => ({
-        size: parseInt(size, 10),
-        quantity: parseInt(quantity, 10),
-      }));
-
-      const data = {
-        code,
-        brand,
-        type,
-        color,
-        stockPrice,
-        importPrice,
-        sizes: sizesData,
-      };
-
-      const requiredFields = {
-        code,
-        brand,
-        type,
-        color,
-        stockPrice,
-        importPrice,
-      };
-      for (const key in requiredFields) {
-        if (!requiredFields[key]) {
+      const requiredFields = [
+        "code",
+        "brand",
+        "type",
+        "color",
+        "stockPrice",
+        "importPrice",
+      ];
+      requiredFields.forEach((key) => {
+        if (!formData[key]) {
           throw new Error(
             `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`
           );
         }
-      }
+      });
+
+      const sizesData = Object.entries(formData.sizes).map(
+        ([size, quantity]) => ({
+          size: parseInt(size, 10),
+          quantity: parseInt(quantity, 10),
+        })
+      );
+
+      const data = { ...formData, sizes: sizesData };
 
       const response = await fetch("/api/v1/products/products", {
         method: "POST",
@@ -153,12 +135,15 @@ function AddProducts() {
         throw new Error(returnData.message);
       }
 
-      setCode("");
-      setBrand(brandOptions[0]);
-      setColor(colorOptions[0]);
-      setImportPrice(0);
-      setStockPrice(0);
-      setType(0);
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        brand: brandOptions[0],
+        color: colorOptions[0],
+        importPrice: 0,
+        stockPrice: 0,
+        type: 0,
+      }));
 
       const options = Alert(200, "Product was added successfully");
       notificationAlertRef.current.notificationAlert(options);
@@ -190,8 +175,9 @@ function AddProducts() {
                       <label>Code</label>
                       <Input
                         type="text"
-                        value={code}
-                        onChange={handleCodeChange}
+                        name="code"
+                        value={formData.code}
+                        onChange={handleChange}
                       />
                     </FormGroup>
                   </Col>
@@ -200,8 +186,9 @@ function AddProducts() {
                       <label>Brand</label>
                       <Input
                         type="select"
-                        value={brand}
-                        onChange={handleBrandChange}
+                        name="brand"
+                        value={formData.brand}
+                        onChange={handleChange}
                       >
                         {brandOptions.map((brand) => (
                           <option key={brand.id} value={brand.id}>
@@ -218,8 +205,9 @@ function AddProducts() {
                       <label>Type</label>
                       <Input
                         type="select"
-                        value={type}
-                        onChange={handleTypeChange}
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
                       >
                         {typeOptions.map((type) => (
                           <option key={type.id} value={type.id}>
@@ -234,8 +222,9 @@ function AddProducts() {
                       <label>Color</label>
                       <Input
                         type="select"
-                        value={color}
-                        onChange={handleColorChange}
+                        name="color"
+                        value={formData.color}
+                        onChange={handleChange}
                       >
                         {colorOptions.map((color) => (
                           <option key={color.id} value={color.id}>
@@ -252,8 +241,9 @@ function AddProducts() {
                       <label>Import Price</label>
                       <Input
                         type="number"
-                        value={importPrice}
-                        onChange={handleImportPriceChange}
+                        name="importPrice"
+                        value={formData.importPrice}
+                        onChange={handleChange}
                       />
                     </FormGroup>
                   </Col>
@@ -262,20 +252,21 @@ function AddProducts() {
                       <label>Stock Price</label>
                       <Input
                         type="number"
-                        value={stockPrice}
-                        onChange={handleStockPriceChange}
+                        name="stockPrice"
+                        value={formData.stockPrice}
+                        onChange={handleChange}
                       />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
-                  {Object.keys(sizes).map((size) => (
+                  {Object.keys(formData.sizes).map((size) => (
                     <Col md="2" key={size}>
                       <FormGroup>
                         <label>Size {size}</label>
                         <Input
                           type="number"
-                          value={sizes[size]}
+                          value={formData.sizes[size]}
                           onChange={(e) => handleSizeQuantityChange(e, size)}
                         />
                       </FormGroup>
