@@ -20,7 +20,6 @@ import React from "react";
 import classNames from "classnames";
 // react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
-import { useEffect } from "react";
 
 // reactstrap components
 import {
@@ -52,20 +51,6 @@ import {
 } from "variables/charts.js";
 
 function Dashboard(props) {
-  useEffect(() => {
-    fetch("/api/v1/sports/sport")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {})
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-      });
-  }, []);
-
   const [bigChartData, setbigChartData] = React.useState("data1");
   const setBgChartData = (name) => {
     setbigChartData(name);

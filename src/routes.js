@@ -25,8 +25,7 @@ import Typography from "views/Typography.js";
 import UserProfile from "views/UserProfile.js";
 import AddProducts from "views/AddProducts.js";
 import CMSPanel from "views/CmsPanels.js";
-import ProductList from "views/PrintProducts";
-import Products from "views/ProductsList";
+import ProductsList from "views/ProductsList";
 import SalesPage from "views/Sales";
 
 var routes = [
@@ -43,7 +42,7 @@ var routes = [
     name: "Products",
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-bag-16",
-    component: <ProductList />,
+    component: <ProductsList />,
     layout: "/admin",
   },
   {

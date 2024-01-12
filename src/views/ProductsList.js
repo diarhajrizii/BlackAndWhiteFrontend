@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../assets/css/print-products.css";
 import {
   Button,
   Card,
@@ -13,97 +14,259 @@ import {
   FormGroup,
   Form,
 } from "reactstrap";
-
-const useBarcodeScanner = (callback) => {
-  useEffect(() => {
-    let scannedCode = "";
-
-    const handleBarcodeScanner = (event) => {
-      if (event.key === "Enter" && scannedCode.length > 0) {
-        console.log("Scanned barcode:", scannedCode);
-
-        if (typeof callback === "function") {
-          callback(scannedCode);
-        }
-
-        scannedCode = "";
-      } else if (event.key !== "Enter" && event.key.length === 1) {
-        scannedCode += event.key;
-      }
-    };
-
-    document.addEventListener("keydown", handleBarcodeScanner);
-    return () => {
-      document.removeEventListener("keydown", handleBarcodeScanner);
-    };
-  }, [callback]);
-};
+import TransferItemsModal from "../modals/transferModal";
+import NotificationAlert from "react-notification-alert";
+import Alert from "../components/Alert/alert";
+import PrintContainer from "components/Print/PrintContainer";
+import BarcodeScanner from "components/Barcode/ScannerCode";
+import FilterForm from "components/Filters/FilterForms";
+import { fetchProducts, fetchLocations } from "components/Api/FetchFunctions";
 
 const ProductList = () => {
-  const [product, setProduct] = useState(null);
-  const [barcode, setBarcode] = useState("");
-  console.log(barcode);
-  const handleBarcodeScanner = async (e) => {
-    try {
-      const response = await fetch(`/api/v1/products/products/${barcode}`);
-      if (response.ok) {
-        const productData = await response.json();
-        setProduct(productData);
-      } else {
-        throw new Error("Failed to fetch product data");
+  // State declarations
+  const notificationAlertRef = React.useRef(null);
+  const [products, setProducts] = useState([]);
+  const [printProducts, setPrintProducts] = useState([]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [codeFilter, setCodeFilter] = useState("");
+  const [brandFilter, setBrandFilter] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [locationsData, setLocationsData] = useState([]);
+
+  // Constants
+  const columns = ["id", "brand", "color", "number", "type", "code", "price"];
+  const tableHeaders = [
+    "ID",
+    "Brand",
+    "Color",
+    "Number",
+    "Type",
+    "Code",
+    "Price",
+  ];
+
+  // Use Effect to fetch products
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedProducts = await fetchProducts();
+        const fetchedLocations = await fetchLocations();
+        setProducts(fetchedProducts);
+        setLocationsData(fetchedLocations);
+      } catch (error) {
+        console.error(error);
+        const options = Alert(400, "Error on fetching data");
+        notificationAlertRef.current.notificationAlert(options);
       }
-    } catch (error) {
-      console.error("Error fetching product data:", error);
-      // Handle errors or show a message to the user
+    };
+
+    fetchData();
+  }, []);
+
+  const openTransferModal = () => {
+    if (filteredProducts.length !== 0) {
+      setTransferModalOpen(true);
+    } else {
+      const options = Alert(400, "Please select a product to transfer");
+      notificationAlertRef.current.notificationAlert(options);
     }
   };
 
-  const handleBarcodeScan = (scannedValue) => {
-    setBarcode(scannedValue);
+  // Handlers
+  const handleProductSelection = (productId) => {
+    const updatedPrintProducts = printProducts.map((product) => {
+      if (product.id === productId) {
+        return { ...product, selected: !product.selected };
+      }
+      return product;
+    });
+    setPrintProducts(updatedPrintProducts);
+    setFilteredProducts(updatedPrintProducts);
   };
 
-  useBarcodeScanner(handleBarcodeScan);
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleEndDateChange = (event) => {
+    setEndDate(event.target.value);
+  };
+
+  const handleCodeFilterChange = (event) => {
+    setCodeFilter(event.target.value);
+  };
+
+  const handleBrandFilterChange = (event) => {
+    setBrandFilter(event.target.value);
+  };
+
+  const handleBarcodeData = (filtered) => {
+    // Check if items already exist based on unique identifiers (e.g., ID)
+    const existingIds = filteredProducts.map((item) => item.id);
+    const newItems = filtered.filter((item) => !existingIds.includes(item.id));
+
+    // Merge new items into filteredProducts
+    const updatedFilteredProducts = [...filteredProducts, ...newItems];
+    setFilteredProducts(updatedFilteredProducts);
+    setPrintProducts(updatedFilteredProducts);
+  };
+
+  const handleAllProductSelection = () => {
+    const allSelected = printProducts.every((product) => product.selected);
+    const updatedPrintProducts = printProducts.map((product) => ({
+      ...product,
+      selected: !allSelected,
+    }));
+    setFilteredProducts(updatedPrintProducts);
+    setPrintProducts(updatedPrintProducts);
+  };
+
+  const selectAll = () => {
+    setFilteredProducts(products);
+    setPrintProducts(products);
+  };
+
+  const handleBarcodeScanned = (scannedValue) => {
+    const syntheticEvent = {
+      preventDefault: () => {}, // Add event methods you need to use
+      target: {
+        value: scannedValue, // Pass scanned value if needed
+        barcode: scannedValue,
+      },
+    };
+
+    handleSubmit(syntheticEvent);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const scannedCode = event?.target?.barcode;
+    const startDateObject = startDate ? new Date(startDate) : null;
+    const endDateObject = endDate ? new Date(endDate) : null;
+
+    const filtered = products.filter((product) => {
+      const productDate = new Date(product.date);
+      const startDateCondition =
+        !startDateObject || productDate >= startDateObject;
+      const endDateCondition = !endDateObject || productDate <= endDateObject;
+
+      const codeCondition =
+        !codeFilter ||
+        product.code.toLowerCase().includes(codeFilter.toLowerCase());
+      const brandCondition =
+        !brandFilter ||
+        product.brand.toLowerCase().includes(brandFilter.toLowerCase());
+      if (scannedCode) {
+        const barcodeCondition = scannedCode === product.barcode;
+        return barcodeCondition;
+      }
+      return (
+        startDateCondition &&
+        endDateCondition &&
+        codeCondition &&
+        brandCondition
+      );
+    });
+    if (!scannedCode) {
+      setFilteredProducts(filtered);
+      setPrintProducts(filtered);
+    } else {
+      handleBarcodeData(filtered);
+    }
+  };
 
   return (
-    <div className="content">
-      <Card>
-        <CardHeader>
-          <Row>
-            <Col className="text-left" sm="6">
-              <h5 className="card-category">CMS</h5>
-              <CardTitle tag="h2">Product Details</CardTitle>
-            </Col>
-            <Col className="text-right" sm="6">
-              <Button color="info" size="sm" onClick={handleBarcodeScan}>
-                Scan Barcode
-              </Button>
-            </Col>
-          </Row>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col sm="6">
-              <FormGroup>
-                <Label for="barcode">Barcode</Label>
-                <Input
-                  type="text"
-                  id="barcode"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
+    <>
+      <div className="content">
+        <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
+        <div className="react-notification-alert-container">
+          <NotificationAlert ref={notificationAlertRef} />
+        </div>
+        <Card>
+          <CardHeader>
+            <Row>
+              <Col className="text-left" sm="6">
+                <h5 className="card-category">CMS</h5>
+                <CardTitle tag="h2">Products</CardTitle>
+              </Col>
+              <Col className="text-right" sm="6">
+                <PrintContainer printProducts={printProducts} />
+              </Col>
+              <Col sm="12">
+                <FilterForm
+                  startDate={startDate}
+                  endDate={endDate}
+                  codeFilter={codeFilter}
+                  brandFilter={brandFilter}
+                  handleStartDateChange={handleStartDateChange}
+                  handleEndDateChange={handleEndDateChange}
+                  handleCodeFilterChange={handleCodeFilterChange}
+                  handleBrandFilterChange={handleBrandFilterChange}
+                  handleSubmit={handleSubmit}
+                  openTransferModal={openTransferModal}
+                  selectAll={selectAll}
                 />
-              </FormGroup>
-            </Col>
-          </Row>
-          {product && (
-            <div>
-              <h4>{product.name}</h4>
-              <p>{product.description}</p>
-              {/* Display other product details as needed */}
-            </div>
-          )}
-        </CardBody>
-      </Card>
-    </div>
+              </Col>
+            </Row>
+          </CardHeader>
+          <CardBody>
+            <Table className="tablesorter productsTable" responsive>
+              <thead className="text-primary">
+                <tr>
+                  {tableHeaders.map((header, index) => (
+                    <th key={index}>{header}</th>
+                  ))}
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={printProducts.every(
+                        (product) => product.selected
+                      )}
+                      onChange={handleAllProductSelection}
+                    />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product, index) => (
+                  <tr key={index}>
+                    {columns.map((key, index) => (
+                      <td className={key} key={index}>
+                        {product[key]}
+                      </td>
+                    ))}
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={
+                          printProducts.find((p) => p.id === product.id)
+                            ?.selected
+                        }
+                        onChange={() => handleProductSelection(product.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
+        <TransferItemsModal
+          modalOpen={transferModalOpen}
+          notificationAlertRef={notificationAlertRef}
+          toggleModal={() => setTransferModalOpen(!transferModalOpen)}
+          productsData={printProducts}
+          locationsData={locationsData}
+          setFilteredProducts={setFilteredProducts}
+        />
+      </div>
+    </>
   );
 };
 
