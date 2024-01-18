@@ -15,8 +15,8 @@ import {
 } from "reactstrap";
 import { fetchProducts } from "components/Api/FetchFunctions";
 import { fetchSalesData } from "components/Api/FetchFunctions";
+import FilterForm from "./../components/Forms/FilterForms";
 import BarcodeScanner from "components/Barcode/ScannerCode";
-import FilterForm from "components/Filters/FilterForms";
 import SaleModal from "modals/SaleModal";
 
 const SalesPage = () => {

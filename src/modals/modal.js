@@ -15,7 +15,7 @@ import "./modal.css";
 import {
   saveColorData,
   saveBrandData,
-  saveTypeData,
+  saveSpecificTypeData,
   saveNumberData,
   editBrandData,
   editColorData,
@@ -110,7 +110,7 @@ const AddItemModal = ({
             data = await saveNumberData(formData);
             break;
           case "types":
-            data = await saveTypeData(formData);
+            data = await saveSpecificTypeData(formData);
             break;
           case "locations":
             data = await saveLocationsData(formData);
@@ -155,6 +155,17 @@ const AddItemModal = ({
           {itemType === "brands" && (
             <>
               <FormGroup>
+                <Label for="type">Type</Label>
+                <Input
+                  type="select"
+                  name="type"
+                  id="type"
+                  value={editItemData.type || "shoes"}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                </Input>
                 <Label for="brandName">Brand Name</Label>
                 <Input
                   type="text"
@@ -221,6 +232,17 @@ const AddItemModal = ({
           {itemType === "numbers" && (
             <>
               <FormGroup>
+                <Label for="type">Type</Label>
+                <Input
+                  type="select"
+                  name="type"
+                  id="type"
+                  value={editItemData.type || "shoes"}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                </Input>
                 <Label for="number">Number</Label>
                 <Input
                   type="text"
@@ -238,10 +260,21 @@ const AddItemModal = ({
               <FormGroup>
                 <Label for="type">Type</Label>
                 <Input
-                  type="text"
+                  type="select"
                   name="type"
                   id="type"
-                  value={editItemData.type || ""}
+                  value={editItemData.type || "shoes"}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                </Input>
+                <Label for="specificType">Specific Type</Label>
+                <Input
+                  type="text"
+                  name="specificType"
+                  id="specificType"
+                  value={editItemData.specificType || ""}
                   placeholder="Enter Type"
                   onChange={handleInputChange}
                 />

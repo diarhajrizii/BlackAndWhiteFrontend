@@ -70,11 +70,11 @@ function CMSPanel() {
       case "colors":
         return ["ID", "Color Name", "Albanian", "English", "Turkish", ""];
       case "brands":
-        return ["ID", "Brand Name", "Produced", ""];
+        return ["ID", "Brand Name", "Produced", "Type", ""];
       case "numbers":
-        return ["ID", "Number", ""];
+        return ["ID", "Number", "Type", ""];
       case "types":
-        return ["ID", "Type", ""];
+        return ["ID", "Specific Type", "Type", ""];
       case "Locations":
         return ["ID", "Locations", ""];
       default:

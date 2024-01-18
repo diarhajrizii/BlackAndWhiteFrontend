@@ -55,7 +55,7 @@ const saveNumberData = async (numberData) => {
   }
 };
 
-const saveTypeData = async (typeData) => {
+const saveSpecificTypeData = async (typeData) => {
   try {
     const response = await fetch("/api/v1/panels/type", {
       method: "POST",
@@ -87,6 +87,26 @@ const saveLocationsData = async (locationData) => {
   } catch (error) {
     console.error("Error saving type data:", error);
     // Handle errors
+  }
+};
+
+const fetchPanelData = async (endpoint) => {
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching panel data:", error);
+    return [];
   }
 };
 
@@ -169,7 +189,7 @@ const editLocationData = async (locationData) => {
 export {
   saveColorData,
   saveBrandData,
-  saveTypeData,
+  saveSpecificTypeData,
   saveNumberData,
   saveData,
   editColorData,
@@ -180,4 +200,5 @@ export {
   saveLocationsData,
   editLocationData,
   transferProducts,
+  fetchPanelData,
 };

@@ -19,8 +19,8 @@ import NotificationAlert from "react-notification-alert";
 import Alert from "../components/Alert/alert";
 import PrintContainer from "components/Print/PrintContainer";
 import BarcodeScanner from "components/Barcode/ScannerCode";
-import FilterForm from "components/Filters/FilterForms";
 import { fetchProducts, fetchLocations } from "components/Api/FetchFunctions";
+import FilterForm from "./../components/Forms/FilterForms";
 
 const ProductList = () => {
   // State declarations
