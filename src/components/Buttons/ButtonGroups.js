@@ -3,9 +3,7 @@ import React from "react";
 import { Button, ButtonGroup } from "reactstrap";
 import classNames from "classnames";
 
-function ButtonGroupComponent({ activeButton, onButtonClick }) {
-  const buttons = ["shoes", "textile", "accessories"];
-
+function ButtonGroupComponent({ activeButton, onButtonClick, buttons }) {
   return (
     <ButtonGroup className="btn-group-toggle float-right" data-toggle="buttons">
       {buttons.map((button) => (

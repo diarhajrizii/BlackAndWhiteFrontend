@@ -165,6 +165,7 @@ const AddItemModal = ({
                 >
                   <option value="shoes">Shoes</option>
                   <option value="textile">Textile</option>
+                  <option value="accessories">Accessories</option>
                 </Input>
                 <Label for="brandName">Brand Name</Label>
                 <Input

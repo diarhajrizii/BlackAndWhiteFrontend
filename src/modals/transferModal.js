@@ -35,16 +35,14 @@ const TransferModal = ({
       if (!response.success) throw new Error(response.message);
 
       toggleModal();
-      const options = Alert(
-        200,
+      notificationAlertRef.current.showNotification(
         `Products with those IDs ${selectedProductIds.join(
           ", "
-        )} have been transferred successfully`
+        )} have been transferred successfully`,
+        "success"
       );
-      notificationAlertRef.current.notificationAlert(options);
     } catch (error) {
-      const options = Alert(400, `${error}`);
-      notificationAlertRef.current.notificationAlert(options);
+      notificationAlertRef.current.showNotification(`${error}`, "danger");
       console.error("Error saving data:", error.message);
     }
   };

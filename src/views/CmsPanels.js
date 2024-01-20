@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import classNames from "classnames";
 import {
   Button,
-  ButtonGroup,
   Card,
   CardHeader,
   CardBody,
@@ -15,6 +13,7 @@ import AddItemModal from "../modals/modal.js";
 import DeleteItemModal from "../modals/deleteModal.js";
 import NotificationAlert from "react-notification-alert";
 import Alert from "../components/Alert/alert.js";
+import ButtonGroupComponent from "components/Buttons/ButtonGroups.js";
 
 function CMSPanel() {
   const notificationAlertRef = React.useRef(null);
@@ -107,27 +106,11 @@ function CMSPanel() {
               <CardTitle tag="h2">CMS Panel</CardTitle>
             </Col>
             <Col sm="6">
-              <ButtonGroup
-                className="btn-group-toggle float-right"
-                data-toggle="buttons"
-              >
-                {["brands", "colors", "numbers", "types", "locations"].map(
-                  (button) => (
-                    <Button
-                      key={button}
-                      tag="label"
-                      color="info"
-                      size="sm"
-                      className={classNames("btn-simple", {
-                        active: activeButton === button,
-                      })}
-                      onClick={() => handleButtonClick(button)}
-                    >
-                      {button.charAt(0).toUpperCase() + button.slice(1)}
-                    </Button>
-                  )
-                )}
-              </ButtonGroup>
+              <ButtonGroupComponent
+                activeButton={activeButton}
+                onButtonClick={handleButtonClick}
+                buttons={["brands", "colors", "numbers", "types", "locations"]}
+              />
             </Col>
             <Col sm="12">
               <Button

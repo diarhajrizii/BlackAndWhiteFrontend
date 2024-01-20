@@ -1,4 +1,5 @@
 // ProductForm.js
+
 import React from "react";
 import { FormGroup, Input, Form, Row, Col } from "reactstrap";
 
@@ -78,6 +79,7 @@ function ProductForm({
           </FormGroup>
         </Col>
       </Row>
+
       <Row>
         <Col md="6">
           <FormGroup>
@@ -102,6 +104,7 @@ function ProductForm({
           </FormGroup>
         </Col>
       </Row>
+
       <Row>
         {Object.keys(formData.sizes).map((size) => (
           <Col md="2" key={size}>

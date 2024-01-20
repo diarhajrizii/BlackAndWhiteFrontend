@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../assets/css/print-products.css";
 import {
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -9,21 +8,17 @@ import {
   Col,
   Row,
   Table,
-  Label,
-  Input,
-  FormGroup,
-  Form,
 } from "reactstrap";
 import TransferItemsModal from "../modals/transferModal";
-import NotificationAlert from "react-notification-alert";
-import Alert from "../components/Alert/alert";
 import PrintContainer from "components/Print/PrintContainer";
 import BarcodeScanner from "components/Barcode/ScannerCode";
 import { fetchProducts, fetchLocations } from "components/Api/FetchFunctions";
 import FilterForm from "./../components/Forms/FilterForms";
+import NotificationComponent from "../components/Alert/alert";
 
 const ProductList = () => {
   // State declarations
+  const notificationComponentRef = useRef(new NotificationComponent());
   const notificationAlertRef = React.useRef(null);
   const [products, setProducts] = useState([]);
   const [printProducts, setPrintProducts] = useState([]);
@@ -48,6 +43,7 @@ const ProductList = () => {
     "Number",
     "Type",
     "Code",
+    "Locations",
     "Price",
   ];
 
@@ -61,8 +57,10 @@ const ProductList = () => {
         setLocationsData(fetchedLocations);
       } catch (error) {
         console.error(error);
-        const options = Alert(400, "Error on fetching data");
-        notificationAlertRef.current.notificationAlert(options);
+        notificationComponentRef.current.showNotification(
+          "Error on fetching data",
+          "danger"
+        );
       }
     };
 
@@ -73,8 +71,10 @@ const ProductList = () => {
     if (filteredProducts.length !== 0) {
       setTransferModalOpen(true);
     } else {
-      const options = Alert(400, "Please select a product to transfer");
-      notificationAlertRef.current.notificationAlert(options);
+      notificationComponentRef.current.showNotification(
+        "Please select a product to transfer",
+        "danger"
+      );
     }
   };
 
@@ -185,9 +185,8 @@ const ProductList = () => {
     <>
       <div className="content">
         <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
-        <div className="react-notification-alert-container">
-          <NotificationAlert ref={notificationAlertRef} />
-        </div>
+        <NotificationComponent ref={notificationComponentRef} />
+
         <Card>
           <CardHeader>
             <Row>
@@ -259,7 +258,7 @@ const ProductList = () => {
         </Card>
         <TransferItemsModal
           modalOpen={transferModalOpen}
-          notificationAlertRef={notificationAlertRef}
+          notificationAlertRef={notificationComponentRef}
           toggleModal={() => setTransferModalOpen(!transferModalOpen)}
           productsData={printProducts}
           locationsData={locationsData}
