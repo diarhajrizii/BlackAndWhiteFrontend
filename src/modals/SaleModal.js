@@ -14,31 +14,30 @@ import {
 import "./modal.css"; // You can create a separate CSS file for SaleModal styles
 
 const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
-  const [paymentTypes, setPaymentTypes] = useState({});
+  const [saleData, setSaleData] = useState(
+    selectedProducts.map((product) => ({
+      regular_price: product.price,
+      id: product.id,
+      price: "",
+      paymentType: "cash",
+      bank: "",
+      type: product.type,
+    }))
+  );
 
   const handleSellProducts = () => {
-    const updatedSaleData = selectedProducts.map((product) => {
-      const price = document.getElementById(`price_${product.id}`).value;
-      const paymentType = paymentTypes[product.id] || "cash";
-      const bank = paymentType === "bank" ? "NLB" : "";
-      return {
-        id: product.id,
-        regular_price: product.price,
-        price,
-        paymentType,
-        bank,
-      };
-    });
-
-    sellProducts(updatedSaleData);
+    sellProducts(saleData);
   };
 
-  const handlePaymentTypeChange = (event, productId) => {
-    const paymentType = event.target.value;
-    setPaymentTypes((prevPaymentTypes) => ({
-      ...prevPaymentTypes,
-      [productId]: paymentType,
-    }));
+  const handleInputChange = (event, productId, field) => {
+    const updatedSaleData = saleData.map((product) => {
+      if (product.id === productId) {
+        return { ...product, [field]: event.target.value };
+      }
+      return product;
+    });
+
+    setSaleData(updatedSaleData);
   };
 
   return (
@@ -57,7 +56,15 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
               <Col sm="6">
                 <FormGroup>
                   <Label for={`price_${product.id}`}>Price</Label>
-                  <Input type="text" id={`price_${product.id}`} />
+                  <Input
+                    type="text"
+                    id={`price_${product.id}`}
+                    value={
+                      saleData.find((item) => item.id === product.id)?.price ||
+                      ""
+                    }
+                    onChange={(e) => handleInputChange(e, product.id, "price")}
+                  />
                 </FormGroup>
               </Col>
               <Col sm="6">
@@ -66,18 +73,33 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
                   <Input
                     type="select"
                     id={`paymentType_${product.id}`}
-                    onChange={(e) => handlePaymentTypeChange(e, product.id)}
+                    value={
+                      saleData.find((item) => item.id === product.id)
+                        ?.paymentType || "cash"
+                    }
+                    onChange={(e) =>
+                      handleInputChange(e, product.id, "paymentType")
+                    }
                   >
                     <option value="cash">Cash</option>
                     <option value="bank">Bank</option>
                   </Input>
                 </FormGroup>
               </Col>
-              {paymentTypes[product.id] === "bank" && (
+              {saleData.find((item) => item.id === product.id)?.paymentType ===
+                "bank" && (
                 <Col sm="6">
                   <FormGroup>
                     <Label for={`bank_${product.id}`}>Bank</Label>
-                    <Input type="select" id={`bank_${product.id}`}>
+                    <Input
+                      type="select"
+                      id={`bank_${product.id}`}
+                      value={
+                        saleData.find((item) => item.id === product.id)?.bank ||
+                        ""
+                      }
+                      onChange={(e) => handleInputChange(e, product.id, "bank")}
+                    >
                       <option value="NLB">NLB</option>
                       <option value="PCB">PCB</option>
                       <option value="TEB">TEB</option>

@@ -1,7 +1,6 @@
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import "./modal.css";
 import { deleteItem } from "../api.js"; // Import API functions
-import Alert from "../components/Alert/alert";
 
 const deleteItemModal = ({
   modalOpen,
@@ -11,7 +10,7 @@ const deleteItemModal = ({
   editItemData,
   setEditItemData,
   tableData,
-  notificationAlertRef,
+  notificationComponentRef,
   // updateModalData, // Receive the function to update modal data
 }) => {
   let modalTitle = "";
@@ -51,14 +50,13 @@ const deleteItemModal = ({
       setTableData(filteredProducts);
       setEditItemData({});
       toggleModal();
-      const options = Alert(
-        200,
-        `Item of ${itemType} with ID:${deletedID} Has deleted successfully`
+
+      notificationComponentRef.current.showNotification(
+        `Item of ${itemType} with ID:${deletedID} Has deleted successfully`,
+        "success"
       );
-      notificationAlertRef.current.notificationAlert(options);
     } catch (error) {
-      const options = Alert(400, `${error}`);
-      notificationAlertRef.current.notificationAlert(options);
+      notificationComponentRef.current.showNotification(`${error}`, "danger");
       console.error("Error saving data:", error);
     }
   };

@@ -10,14 +10,13 @@ import {
 } from "reactstrap";
 import "./modal.css";
 import { transferProducts } from "../api.js";
-import Alert from "../components/Alert/alert";
 
 const TransferModal = ({
   modalOpen,
   productsData,
   toggleModal,
   locationsData,
-  notificationAlertRef,
+  notificationComponentRef,
 }) => {
   const [location, setLocation] = useState("");
 
@@ -35,14 +34,14 @@ const TransferModal = ({
       if (!response.success) throw new Error(response.message);
 
       toggleModal();
-      notificationAlertRef.current.showNotification(
+      notificationComponentRef.current.showNotification(
         `Products with those IDs ${selectedProductIds.join(
           ", "
         )} have been transferred successfully`,
         "success"
       );
     } catch (error) {
-      notificationAlertRef.current.showNotification(`${error}`, "danger");
+      notificationComponentRef.current.showNotification(`${error}`, "danger");
       console.error("Error saving data:", error.message);
     }
   };

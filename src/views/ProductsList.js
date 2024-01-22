@@ -19,7 +19,6 @@ import NotificationComponent from "../components/Alert/alert";
 const ProductList = () => {
   // State declarations
   const notificationComponentRef = useRef(new NotificationComponent());
-  const notificationAlertRef = React.useRef(null);
   const [products, setProducts] = useState([]);
   const [printProducts, setPrintProducts] = useState([]);
   const [startDate, setStartDate] = useState(
@@ -35,7 +34,17 @@ const ProductList = () => {
   const [locationsData, setLocationsData] = useState([]);
 
   // Constants
-  const columns = ["id", "brand", "color", "number", "type", "code", "price"];
+  const columns = [
+    "id",
+    "brand",
+    "color",
+    "number",
+    "specific_type",
+    "code",
+    "location",
+    "quantity",
+    "price",
+  ];
   const tableHeaders = [
     "ID",
     "Brand",
@@ -44,6 +53,7 @@ const ProductList = () => {
     "Type",
     "Code",
     "Locations",
+    "Quantity",
     "Price",
   ];
 
@@ -51,7 +61,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedProducts = await fetchProducts();
+        const fetchedProducts = await fetchProducts("productList");
         const fetchedLocations = await fetchLocations();
         setProducts(fetchedProducts);
         setLocationsData(fetchedLocations);
@@ -258,7 +268,7 @@ const ProductList = () => {
         </Card>
         <TransferItemsModal
           modalOpen={transferModalOpen}
-          notificationAlertRef={notificationComponentRef}
+          notificationComponentRef={notificationComponentRef}
           toggleModal={() => setTransferModalOpen(!transferModalOpen)}
           productsData={printProducts}
           locationsData={locationsData}

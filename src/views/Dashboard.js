@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useEffect, useState } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react plugin used to create charts
@@ -55,6 +55,23 @@ function Dashboard(props) {
   const setBgChartData = (name) => {
     setbigChartData(name);
   };
+  const [chartData, setChartData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data1 = await chartExample1.data1(
+          document.createElement("canvas")
+        );
+        setChartData(data1);
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       <div className="content">
@@ -133,6 +150,14 @@ function Dashboard(props) {
                     data={chartExample1[bigChartData]}
                     options={chartExample1.options}
                   />
+
+                  {/* {chartData && (
+                        <Line
+                          data={chartData}
+                          options={chartExample1.options}
+                        />
+                      )}
+                    </div>{" "} */}
                 </div>
               </CardBody>
             </Card>

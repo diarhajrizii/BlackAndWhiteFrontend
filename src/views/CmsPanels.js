@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
   Card,
@@ -11,12 +11,11 @@ import {
 } from "reactstrap";
 import AddItemModal from "../modals/modal.js";
 import DeleteItemModal from "../modals/deleteModal.js";
-import NotificationAlert from "react-notification-alert";
-import Alert from "../components/Alert/alert.js";
 import ButtonGroupComponent from "components/Buttons/ButtonGroups.js";
+import NotificationComponent from "../components/Alert/alert.js";
 
 function CMSPanel() {
-  const notificationAlertRef = React.useRef(null);
+  const notificationComponentRef = useRef(new NotificationComponent());
   const [tableData, setTableData] = useState([]);
   const [activeButton, setActiveButton] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -57,11 +56,10 @@ function CMSPanel() {
     const updatedTableData = [...tableData, formData];
     setTableData(updatedTableData);
     toggleModal();
-    const options = Alert(
-      200,
-      `A new item has added to ${modalItemType} successfully`
+    notificationComponentRef.current.showNotification(
+      `A new item has added to ${modalItemType} successfully`,
+      "success"
     );
-    notificationAlertRef.current.notificationAlert(options);
   };
 
   const renderTableHeaders = () => {
@@ -96,7 +94,7 @@ function CMSPanel() {
   return (
     <div className="content">
       <div className="react-notification-alert-container">
-        <NotificationAlert ref={notificationAlertRef} />
+        <NotificationComponent ref={notificationComponentRef} />
       </div>
       <Card className="card-chart">
         <CardHeader>
@@ -158,7 +156,7 @@ function CMSPanel() {
         modalOpen={modalOpen}
         toggleModal={() => setModalOpen(!modalOpen)}
         itemType={modalItemType}
-        notificationAlertRef={notificationAlertRef}
+        notificationComponentRef={notificationComponentRef}
         addNewItem={addNewItem}
         setTableData={setTableData}
         tableData={tableData}
@@ -167,7 +165,7 @@ function CMSPanel() {
       />
       <DeleteItemModal
         modalOpen={deleteModalOpen}
-        notificationAlertRef={notificationAlertRef}
+        notificationComponentRef={notificationComponentRef}
         toggleModal={() => setDeleteModalOpen(!deleteModalOpen)}
         itemType={modalItemType}
         setTableData={setTableData}

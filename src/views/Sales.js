@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   Card,
   CardBody,
   CardHeader,
   Col,
   Row,
   Table,
-  Input,
-  FormGroup,
-  Form,
-  Label,
   CardTitle,
+  Button,
 } from "reactstrap";
-import { fetchProducts } from "components/Api/FetchFunctions";
-import { fetchSalesData } from "components/Api/FetchFunctions";
+import { fetchProducts, fetchSalesData } from "components/Api/FetchFunctions";
 import FilterForm from "./../components/Forms/FilterForms";
 import BarcodeScanner from "components/Barcode/ScannerCode";
 import SaleModal from "modals/SaleModal";
+import { number } from "prop-types";
 
 const SalesPage = () => {
   // States for product search and sales data
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [products, setProducts] = useState([]);
   const [codeFilter, setCodeFilter] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
@@ -28,7 +25,16 @@ const SalesPage = () => {
   const [sales, setSales] = useState([]);
 
   // Constants
-  const columns = ["id", "brand", "color", "number", "type", "code", "price"];
+  const columns = [
+    "id",
+    "brand",
+    "color",
+    "number",
+    "specific_type",
+    "code",
+    "quantity",
+    "price",
+  ];
   const tableHeaders = [
     "ID",
     "Brand",
@@ -36,6 +42,7 @@ const SalesPage = () => {
     "Number",
     "Type",
     "Code",
+    "Quantity",
     "Price",
   ];
   const salesColumns = [
@@ -43,12 +50,12 @@ const SalesPage = () => {
     "brand_name",
     "color_name",
     "number",
-    "product_type",
+    "product_specific_types",
     "code",
     "product_price",
-    "sale_price",
     "payment_type",
     "bank_name",
+    "sale_price",
   ];
 
   const salesTableHeaders = [
@@ -59,9 +66,9 @@ const SalesPage = () => {
     "Type",
     "Code",
     "Price",
-    "Sale Price",
     "Payment Type",
     "Bank Name",
+    "Sale Price",
   ];
 
   const [selectedProducts, setSelectedProducts] = useState([]); // State to store selected products
@@ -70,19 +77,34 @@ const SalesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedProducts = await fetchProducts();
-        const fetchedSalesData = await fetchSalesData();
-        setProducts(fetchedProducts);
+        const formattedDate = selectedDate.toISOString().split("T")[0];
+        const fetchedSalesData = await fetchSalesData(formattedDate);
         setSales(fetchedSalesData);
+        if (!products.length) {
+          const fetchedProducts = await fetchProducts("sales", formattedDate);
+          setProducts(fetchedProducts);
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [selectedDate]);
 
   // Handlers
+  const handlePreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
   const handleProductSelection = (productId) => {
     const updatedPrintProducts = filteredProducts.map((product) => {
       if (product.id === productId) {
@@ -192,7 +214,20 @@ const SalesPage = () => {
         <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
         <Card>
           <CardHeader>
-            <h5 className="card-category">Sales</h5>
+            {/* <h5 className="card-category">Sales</h5> */}
+            <Row>
+              <Col className="text-left" sm="3">
+                <h5 className="card-category">Sales</h5>
+
+                {/* <h5 className="card-category">CMS</h5> */}
+                <CardTitle tag="h2">Products</CardTitle>
+              </Col>
+              <Col sm="12" className="text-center">
+                <Button onClick={handlePreviousDay}>&lt;</Button>
+                <span className="mx-1">{selectedDate.toDateString()}</span>
+                <Button onClick={handleNextDay}>&gt;</Button>
+              </Col>
+            </Row>
           </CardHeader>
           <CardBody>
             <Table className="tablesorter productsTable" responsive>
@@ -213,6 +248,20 @@ const SalesPage = () => {
                     ))}
                   </tr>
                 ))}
+                <tr>
+                  <td colSpan={salesColumns.length - 1}></td>
+                  {/* <td>Total Sale Price:</td> */}
+                  <td className="text-success text-right">
+                    {/* Calculate and display total sale price */}
+                    {sales
+                      .reduce(
+                        (total, sale) =>
+                          Number(total) + Number(sale.sale_price || 0),
+                        0
+                      )
+                      .toFixed(2)}
+                  </td>
+                </tr>
               </tbody>
             </Table>
           </CardBody>

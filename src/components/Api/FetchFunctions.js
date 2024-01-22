@@ -1,7 +1,7 @@
 // apiCalls.js
-export const fetchProducts = async () => {
+export const fetchProducts = async (type) => {
   try {
-    const response = await fetch(`/api/v1/products/products`);
+    const response = await fetch(`/api/v1/products/products?type=${type}`);
     if (response.ok) {
       const responseData = await response.json();
       const fetchedProducts = responseData.data.data.map((product) => ({
@@ -32,9 +32,9 @@ export const fetchLocations = async () => {
     throw new Error("Failed to fetch locations");
   }
 };
-export const fetchSalesData = async () => {
+export const fetchSalesData = async (date) => {
   try {
-    const response = await fetch("/api/v1/transactions");
+    const response = await fetch(`/api/v1/transactions?date=${date}`);
     if (response.ok) {
       const responseData = await response.json();
       return responseData.data.data;

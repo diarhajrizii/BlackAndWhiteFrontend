@@ -24,7 +24,6 @@ import {
   saveLocationsData,
   editLocationData,
 } from "../api.js"; // Import API functions
-import Alert from "../components/Alert/alert";
 
 const AddItemModal = ({
   modalOpen,
@@ -34,7 +33,7 @@ const AddItemModal = ({
   setTableData,
   editItemData,
   setEditItemData,
-  notificationAlertRef,
+  notificationComponentRef,
   tableData,
   // updateModalData, // Receive the function to update modal data
 }) => {
@@ -88,11 +87,10 @@ const AddItemModal = ({
 
     setTableData(updatedItems);
     toggleModal();
-    const options = Alert(
-      200,
-      `Item of ${itemType} with ID:${formData.id} has updated successfully`
+    notificationComponentRef.current.showNotification(
+      `Item of ${itemType} with ID:${formData.id} has updated successfully`,
+      "success"
     );
-    notificationAlertRef.current.notificationAlert(options);
   };
 
   const handleSubmit = async () => {
