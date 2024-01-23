@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Black Dashboard React v1.2.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/black-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useState } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
@@ -49,6 +32,7 @@ import {
   chartExample3,
   chartExample4,
 } from "variables/charts.js";
+import { chartExample21 } from "variables/charts";
 
 function Dashboard(props) {
   const [bigChartData, setbigChartData] = React.useState("data1");
@@ -60,7 +44,7 @@ function Dashboard(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data1 = await chartExample1.data1(
+        const data1 = await chartExample21.data1(
           document.createElement("canvas")
         );
         setChartData(data1);
@@ -146,18 +130,14 @@ function Dashboard(props) {
               </CardHeader>
               <CardBody>
                 <div className="chart-area">
-                  <Line
+                  {/* <Line
                     data={chartExample1[bigChartData]}
                     options={chartExample1.options}
-                  />
+                  /> */}
 
-                  {/* {chartData && (
-                        <Line
-                          data={chartData}
-                          options={chartExample1.options}
-                        />
-                      )}
-                    </div>{" "} */}
+                  {chartData && (
+                    <Line data={chartData} options={chartExample1.options} />
+                  )}
                 </div>
               </CardBody>
             </Card>

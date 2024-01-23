@@ -1,28 +1,11 @@
-/*!
-
-=========================================================
-* Black Dashboard React v1.2.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/black-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 const fetchSalesData = async () => {
   try {
-    const response = await fetch(`/api/v1/transactions`);
+    const response = await fetch(`/api/v1/transactions/years`);
+    console.log(response);
     if (response.ok) {
       const responseData = await response.json();
-      console.log(responseData);
-      return responseData.data.data;
+      console.log(responseData.data);
+      return responseData.data;
     } else {
       throw new Error("Failed to fetch sales data");
     }
@@ -31,9 +14,6 @@ const fetchSalesData = async () => {
     // Handle errors or show a message to the user
   }
 };
-// ##############################
-// // // Chart variables
-// #############################
 
 // chartExample1 and chartExample2 options
 let chart1_2_options = {
@@ -1032,8 +1012,84 @@ let chartExample20 = {
 };
 // Chart Example 17 (Bar Chart)
 let chartExample21 = {
+  data1: async (canvas) => {
+    let ctx = canvas.getContext("2d");
+
+    let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
+    gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
+    gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
+
+    try {
+      const salesData = await fetchSalesData(); // Assuming fetchSalesData is an asynchronous function
+      // const salePrices = salesData.map((sale) => parseFloat(sale.sale_price));
+      // console.log(salePrices);
+
+      return {
+        labels: [
+          "JAN",
+          "FEB",
+          "MAR",
+          "APR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AUG",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DEC",
+        ],
+        datasets: [
+          {
+            label: "2023",
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(75,192,192,0.8)",
+            hoverBorderColor: "rgba(75,192,192,1)",
+            data: salesData.totalSalesArray2023,
+          },
+          {
+            label: "2022",
+            backgroundColor: "rgba(255,99,132,0.4)",
+            borderColor: "rgba(255,99,132,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(255,99,132,0.8)",
+            hoverBorderColor: "rgba(255,99,132,1)",
+            data: salesData.totalSalesArray2022,
+          },
+          {
+            label: "2021",
+            backgroundColor: "rgba(255,206,86,0.4)",
+            borderColor: "rgba(255,206,86,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(255,206,86,0.8)",
+            hoverBorderColor: "rgba(255,206,86,1)",
+            data: salesData.totalSalesArray2021,
+          },
+        ],
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  },
   data: {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    labels: [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ],
     datasets: [
       {
         label: "Category A",
