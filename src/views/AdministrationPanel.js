@@ -28,7 +28,6 @@ function AdministrationPanel() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch initial data for the "articles" section
     fetchTableData("sales");
   }, []);
 
@@ -91,22 +90,16 @@ function AdministrationPanel() {
   };
 
   const updateQuantity = (productId, quantityToAdd) => {
-    console.log(productId, quantityToAdd, "Hihihih22");
-    // Find the index of the product with the given id
     const productIndex = tableData.findIndex(
       (product) => product.id === Number(productId)
     );
 
     // Create a new array with the updated quantity
     const updatedProducts = [...tableData];
-    // console.log(updatedProducts);
-    console.log(productIndex, "Inxx");
-    console.log(updatedProducts[productIndex].quantity, "Quantityyy");
     updatedProducts[productIndex] = {
       ...updatedProducts[productIndex],
       quantity: updatedProducts[productIndex].quantity + Number(quantityToAdd),
     };
-    console.log(updatedProducts, "UUUU");
     // Update the state with the new array
     setTableData(updatedProducts);
   };

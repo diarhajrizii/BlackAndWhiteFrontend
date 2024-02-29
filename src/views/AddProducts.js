@@ -73,11 +73,11 @@ function AddProducts() {
 
       setFormData((prevData) => ({
         // Uncomment if you want to not reset inputs value when changing type
-        // ...prevData,
+        ...prevData,
         code: "",
         brand: brandData.data.data[0]?.id || 0,
-        type: colorData.data.data[0]?.id || 0,
-        color: typeData.data.data[0]?.id || 0,
+        type: typeData.data.data[0]?.id || 0,
+        color: colorData.data.data[0]?.id || 0,
         sizes: Object.fromEntries(
           numberData.data.data.map((number) => [number.number, 0])
         ),
@@ -146,7 +146,6 @@ function AddProducts() {
           );
         }
       });
-
       // Prepare sizes data
       const sizesData = Object.entries(formData.sizes).map(
         ([size, quantity]) => ({
@@ -179,11 +178,8 @@ function AddProducts() {
       setFormData((prevData) => ({
         ...prevData,
         code: "",
-        brand: brandOptions[0],
-        color: colorOptions[0],
         importPrice: 0,
         stockPrice: 0,
-        type: 0,
         name: "",
       }));
 

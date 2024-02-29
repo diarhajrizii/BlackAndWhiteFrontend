@@ -42,7 +42,6 @@ const ProductList = () => {
     "specific_type",
     "code",
     "location",
-    "quantity",
     "price",
   ];
   const tableHeaders = [
@@ -53,7 +52,6 @@ const ProductList = () => {
     "Type",
     "Code",
     "Locations",
-    "Quantity",
     "Price",
   ];
 
@@ -160,11 +158,16 @@ const ProductList = () => {
     const startDateObject = startDate ? new Date(startDate) : null;
     const endDateObject = endDate ? new Date(endDate) : null;
 
+    const startOfDay = new Date(startDateObject);
+    startOfDay.setHours(0, 0, 0, 0); // Set time to 00:00:00.000
+
+    const endOfDay = new Date(endDateObject);
+    endOfDay.setHours(23, 59, 59, 999); // Set time to 23:59:59.999
+
     const filtered = products.filter((product) => {
       const productDate = new Date(product.date);
-      const startDateCondition =
-        !startDateObject || productDate >= startDateObject;
-      const endDateCondition = !endDateObject || productDate <= endDateObject;
+      const startDateCondition = !startDateObject || productDate >= startOfDay;
+      const endDateCondition = !endDateObject || productDate <= endOfDay;
 
       const codeCondition =
         !codeFilter ||
@@ -172,10 +175,12 @@ const ProductList = () => {
       const brandCondition =
         !brandFilter ||
         product.brand.toLowerCase().includes(brandFilter.toLowerCase());
+
       if (scannedCode) {
         const barcodeCondition = scannedCode === product.barcode;
         return barcodeCondition;
       }
+
       return (
         startDateCondition &&
         endDateCondition &&
@@ -183,6 +188,7 @@ const ProductList = () => {
         brandCondition
       );
     });
+
     if (!scannedCode) {
       setFilteredProducts(filtered);
       setPrintProducts(filtered);
@@ -226,22 +232,27 @@ const ProductList = () => {
           </CardHeader>
           <CardBody>
             <Table className="tablesorter productsTable" responsive>
-              <thead className="text-primary">
-                <tr>
-                  {tableHeaders.map((header, index) => (
-                    <th key={index}>{header}</th>
-                  ))}
-                  <th>
-                    <input
-                      type="checkbox"
-                      checked={printProducts.every(
-                        (product) => product.selected
-                      )}
-                      onChange={handleAllProductSelection}
-                    />
-                  </th>
-                </tr>
-              </thead>
+              {filteredProducts.length > 0 ? (
+                <thead className="text-primary">
+                  <tr>
+                    {tableHeaders.map((header, index) => (
+                      <th key={index}>{header}</th>
+                    ))}
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={printProducts.every(
+                          (product) => product.selected
+                        )}
+                        onChange={handleAllProductSelection}
+                      />
+                    </th>
+                  </tr>
+                </thead>
+              ) : (
+                ""
+              )}
+
               <tbody>
                 {filteredProducts.map((product, index) => (
                   <tr key={index}>
