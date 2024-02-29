@@ -1,15 +1,16 @@
 import Dashboard from "views/Dashboard.js";
 import Icons from "views/Icons.js";
-import Map from "views/Map.js";
+// import Map from "views/Map.js";
 import Notifications from "views/Notifications.js";
-import Rtl from "views/Rtl.js";
+// import Rtl from "views/Rtl.js";
 import TableList from "views/TableList.js";
-import Typography from "views/Typography.js";
+// import Typography from "views/Typography.js";
 import UserProfile from "views/UserProfile.js";
 import AddProducts from "views/AddProducts.js";
 import CMSPanel from "views/CmsPanels.js";
 import ProductsList from "views/ProductsList";
 import SalesPage from "views/Sales";
+import AdministrationPanel from "views/AdministrationPanel";
 
 var routes = [
   {
@@ -21,18 +22,10 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/products",
-    name: "Products",
-    rtlName: "لوحة القيادة",
-    icon: "tim-icons icon-bag-16",
-    component: <ProductsList />,
-    layout: "/admin",
-  },
-  {
     path: "/sales",
     name: "Sales",
     rtlName: "لوحة القيادة",
-    icon: "tim-icons icon-bag-16",
+    icon: "tim-icons icon-paper",
     component: <SalesPage />,
     layout: "/admin",
   },
@@ -72,12 +65,32 @@ var routes = [
     // redirect: true,
     layout: "/admin",
   },
+
+  {
+    path: "/products",
+    name: "Products",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-bag-16",
+    component: <ProductsList />,
+    layout: "/admin",
+  },
+
   {
     path: "/cms",
     name: "CMS Panels",
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-chart-pie-36",
     component: <CMSPanel />,
+    // redirect: true,
+    layout: "/admin",
+  },
+
+  {
+    path: "/settings",
+    name: "Administration",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-settings-gear-63",
+    component: <AdministrationPanel />,
     // redirect: true,
     layout: "/admin",
   },
@@ -91,15 +104,15 @@ var routes = [
     // redirect: true,
     layout: "/admin",
   },
-  {
-    path: "/map",
-    name: "Map",
-    rtlName: "خرائط",
-    icon: "tim-icons icon-pin",
-    component: <Map />,
-    // redirect: true,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/map",
+  //   name: "Map",
+  //   rtlName: "خرائط",
+  //   icon: "tim-icons icon-pin",
+  //   component: <Map />,
+  //   // redirect: true,
+  //   layout: "/admin",
+  // },
   {
     path: "/notifications",
     name: "Notifications",
@@ -127,23 +140,23 @@ var routes = [
     // redirect: true,
     layout: "/admin",
   },
-  {
-    path: "/typography",
-    name: "Typography",
-    rtlName: "طباعة",
-    icon: "tim-icons icon-align-center",
-    component: <Typography />,
-    // redirect: true,
-    layout: "/admin",
-  },
-  {
-    path: "/rtl-support",
-    name: "RTL Support",
-    rtlName: "ار تي ال",
-    icon: "tim-icons icon-world",
-    component: <Rtl />,
-    // redirect: true,
-    layout: "/rtl",
-  },
+  // {
+  //   path: "/typography",
+  //   name: "Typography",
+  //   rtlName: "طباعة",
+  //   icon: "tim-icons icon-align-center",
+  //   component: <Typography />,
+  //   // redirect: true,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/rtl-support",
+  //   name: "RTL Support",
+  //   rtlName: "ار تي ال",
+  //   icon: "tim-icons icon-world",
+  //   component: <Rtl />,
+  //   // redirect: true,
+  //   layout: "/rtl",
+  // },
 ];
 export default routes;

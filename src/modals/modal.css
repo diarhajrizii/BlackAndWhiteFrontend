@@ -18,4 +18,24 @@
 .sale-item {
   margin-bottom: 15px;
 }
+
+.record-sale-modal .modal-content {
+  background-color: #27293d !important;
+}
+.record-sale-modal .modal-content .modal-footer {
+  padding: 0px 24px 24px 24px;
+}
+.record-sale-modal .form-group input {
+  margin-bottom: 5px;
+}
+.record-sale-modal .form-group label {
+  margin-left: 2px !important;
+  margin-bottom: 0.1rem !important;
+}
+.record-sale-modal .modal-title {
+  color: white !important;
+}
+.sale-item {
+  margin-bottom: 15px;
+}
 /* .form-group; */

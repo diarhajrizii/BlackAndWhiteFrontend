@@ -13,7 +13,6 @@ import { fetchProducts, fetchSalesData } from "components/Api/FetchFunctions";
 import FilterForm from "./../components/Forms/FilterForms";
 import BarcodeScanner from "components/Barcode/ScannerCode";
 import SaleModal from "modals/SaleModal";
-import { number } from "prop-types";
 
 const SalesPage = () => {
   // States for product search and sales data
@@ -73,6 +72,7 @@ const SalesPage = () => {
 
   const [selectedProducts, setSelectedProducts] = useState([]); // State to store selected products
   const [showSaleModal, setShowSaleModal] = useState(false); // State to control the sale modal visibility
+
   // Fetch products function (similar to ProductList fetchProducts)
   useEffect(() => {
     const fetchData = async () => {

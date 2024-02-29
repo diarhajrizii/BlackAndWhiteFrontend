@@ -35,7 +35,6 @@ const AddItemModal = ({
   setEditItemData,
   notificationComponentRef,
   tableData,
-  // updateModalData, // Receive the function to update modal data
 }) => {
   let modalTitle = "";
   const [formData, setFormData] = useState({});

@@ -9,7 +9,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import AddItemModal from "../modals/modal.js";
+import AddItemModal from "../modals/addItemsModal.js";
 import DeleteItemModal from "../modals/deleteModal.js";
 import ButtonGroupComponent from "components/Buttons/ButtonGroups.js";
 import NotificationComponent from "../components/Alert/alert.js";
