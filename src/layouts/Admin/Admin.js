@@ -88,7 +88,8 @@ function Admin(props) {
             <Sidebar
               routes={routes}
               logo={{
-                outterLink: "https://www.creative-tim.com/",
+                // TODO Web Page Link
+                outterLink: "/",
                 text: "Black&White CMS",
                 imgSrc: logo,
               }}

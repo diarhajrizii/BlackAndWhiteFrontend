@@ -32,7 +32,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Company (disabled)</label>
                         <Input
-                          defaultValue="Creative Code Inc."
+                          defaultValue="Black and White LLC."
                           disabled
                           placeholder="Company"
                           type="text"

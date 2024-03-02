@@ -108,7 +108,7 @@ function RTL(props) {
                 routes={routes}
                 rtlActive
                 logo={{
-                  outterLink: "https://www.creative-tim.com/",
+                  outterLink: "/",
                   text: "الإبداعية تيم",
                   imgSrc: logo,
                 }}
