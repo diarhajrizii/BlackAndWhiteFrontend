@@ -16,6 +16,7 @@ const AddQuantityModal = ({
   toggleModal,
   updateQuantity,
   administrationSalesData,
+  notificationMessage,
 }) => {
   const [formData, setFormData] = useState({
     articleId: "",
@@ -38,7 +39,7 @@ const AddQuantityModal = ({
       // Handle response data if needed
       return responseData; // Return response data if needed
     } catch (error) {
-      console.error("Error saving brand data:", error);
+      console.error("Error on updating quantity of article", error);
       // Handle errors
     }
   };
@@ -52,7 +53,7 @@ const AddQuantityModal = ({
     try {
       console.log(formData);
 
-      const { data } = await insertQuantityData(formData);
+      await insertQuantityData(formData);
 
       updateQuantity(formData.articleId, formData.quantity);
 
@@ -62,6 +63,7 @@ const AddQuantityModal = ({
       // Close the modal
       toggleModal("quantity");
     } catch (error) {
+      notificationMessage("danger", "Error on updating quantity of article");
       console.log(error);
     }
     setFormData({ articleId: "", quantity: 0 });

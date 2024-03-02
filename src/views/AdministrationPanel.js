@@ -64,7 +64,7 @@ function AdministrationPanel() {
   };
 
   const toggleModal = (itemType) => {
-    console.log(itemType);
+    setEditItemData({});
     if (itemType === "articles") {
       setArticlesModalOpen(true);
     } else if (itemType === "quantity") {
@@ -72,8 +72,6 @@ function AdministrationPanel() {
     } else {
       setSalesModalOpen(true);
     }
-    setEditItemData({});
-    // setModalOpen(!modalOpen);
   };
 
   const addNewItem = (formData) => {
@@ -85,8 +83,8 @@ function AdministrationPanel() {
     );
   };
 
-  const failedItem = (message) => {
-    notificationComponentRef.current.showNotification(message, "danger");
+  const notificationMessage = (type, message) => {
+    notificationComponentRef.current.showNotification(message, type);
   };
 
   const updateQuantity = (productId, quantityToAdd) => {
@@ -104,15 +102,20 @@ function AdministrationPanel() {
     setTableData(updatedProducts);
   };
 
+  const openEditModal = (item) => {
+    setEditItemData(item);
+    setArticlesModalOpen(true);
+  };
+
   const renderTableHeaders = () => {
     // Adjust headers based on the active button
     switch (activeButton) {
       case "articles":
         return ["ID", "Article ID", "Name", "Quantity", ""];
       case "quantity":
-        return ["ID", "Article Name", "Quantity", ""];
+        return ["ID", "Article Name", "Quantity"];
       case "sales":
-        return ["ID", "Article Name", "Selling Price", "Sale Date", ""];
+        return ["ID", "Article Name", "Selling Price", "Sale Date"];
       default:
         return [];
     }
@@ -165,9 +168,14 @@ function AdministrationPanel() {
                   {Object.keys(item).map((key, index) => (
                     <td key={index}>{item[key]}</td>
                   ))}
-                  <td align="right" key={index}>
-                    {/* Buttons for editing and deleting (similar to CMSPanel) */}
-                  </td>
+                  {activeButton === "articles" ? (
+                    <td align="right" key={index}>
+                      <Button color="link" onClick={() => openEditModal(item)}>
+                        <i className="tim-icons icon-pencil" />
+                        <span className="d-lg-none d-md-block">Edit</span>
+                      </Button>
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>
@@ -181,7 +189,7 @@ function AdministrationPanel() {
         toggleModal={() => setQuantityModalOpen(!quantityModalOpen)}
         updateQuantity={updateQuantity}
         notificationComponentRef={notificationComponentRef}
-        failedItem={failedItem}
+        notificationMessage={notificationMessage}
       />
       <AddAdministrationModal
         modalOpen={articlesModalOpen}
@@ -192,7 +200,7 @@ function AdministrationPanel() {
         editItemData={editItemData}
         setEditItemData={setEditItemData}
         notificationComponentRef={notificationComponentRef}
-        failedItem={failedItem}
+        notificationMessage={notificationMessage}
       />
       <RecordSaleModal
         modalOpen={salesModalOpen}
@@ -200,7 +208,7 @@ function AdministrationPanel() {
         toggleModal={() => setSalesModalOpen(!salesModalOpen)}
         addNewItem={addNewItem}
         notificationComponentRef={notificationComponentRef}
-        failedItem={failedItem}
+        notificationMessage={notificationMessage}
       />
     </div>
   );

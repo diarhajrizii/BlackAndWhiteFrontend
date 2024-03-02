@@ -16,7 +16,7 @@ const RecordSaleModal = ({
   toggleModal,
   addNewItem,
   administrationSalesData,
-  failedItem,
+  notificationMessage,
 }) => {
   const [formData, setFormData] = useState({
     articleId: "", // Updated the state to hold the selected article's ID
@@ -85,7 +85,10 @@ const RecordSaleModal = ({
       // Close the modal
       toggleModal("articles");
     } catch (error) {
-      failedItem("Error on recording new administration sale");
+      notificationMessage(
+        "danger",
+        "Error on recording new administration sale"
+      );
       console.log(error);
     }
   };
