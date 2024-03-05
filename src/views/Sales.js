@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardBody,
@@ -13,9 +13,11 @@ import { fetchProducts, fetchSalesData } from "components/Api/FetchFunctions";
 import FilterForm from "./../components/Forms/FilterForms";
 import BarcodeScanner from "components/Barcode/ScannerCode";
 import SaleModal from "modals/SaleModal";
+import NotificationComponent from "components/Alert/alert";
 
 const SalesPage = () => {
   // States for product search and sales data
+  const notificationComponentRef = useRef(new NotificationComponent());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [products, setProducts] = useState([]);
   const [codeFilter, setCodeFilter] = useState("");
@@ -105,14 +107,33 @@ const SalesPage = () => {
     setSelectedDate(newDate);
   };
 
+  const resetFilteredProducts = () => {
+    setBrandFilter("");
+    setCodeFilter("");
+    setFilteredProducts([]);
+  };
+
+  const removeSalesProduct = (saleData) => {
+    saleData.map((saleProduct) => {
+      // Reset FilteredProducts if needed
+      // setFilteredProducts([]);
+      setFilteredProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== saleProduct.id)
+      );
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== saleProduct.id)
+      );
+    });
+  };
+
   const handleProductSelection = (productId) => {
-    const updatedPrintProducts = filteredProducts.map((product) => {
+    const updatedFilteredProducts = filteredProducts.map((product) => {
       if (product.id === productId) {
         return { ...product, selected: !product.selected };
       }
       return product;
     });
-    setFilteredProducts(updatedPrintProducts);
+    setFilteredProducts(updatedFilteredProducts);
   };
 
   const handleCodeFilterChange = (event) => {
@@ -171,11 +192,11 @@ const SalesPage = () => {
 
   const handleAllProductSelection = () => {
     const allSelected = filteredProducts.every((product) => product.selected);
-    const updatedPrintProducts = filteredProducts.map((product) => ({
+    const updatedFilteredProducts = filteredProducts.map((product) => ({
       ...product,
       selected: !allSelected,
     }));
-    setFilteredProducts(updatedPrintProducts);
+    setFilteredProducts(updatedFilteredProducts);
   };
   const handleSale = () => {
     const selected = filteredProducts.filter((product) => product.selected);
@@ -197,7 +218,19 @@ const SalesPage = () => {
         const data = await response.json();
         console.log("Sale Data:", data);
         setShowSaleModal(false); // Close the modal after handling the sale data
+        removeSalesProduct(saleData);
+
+        notificationComponentRef.current.showNotification(
+          `${
+            saleData?.length > 1 ? "Products are" : "Product is"
+          } register to sales successfully`,
+          "success"
+        );
       } else {
+        notificationComponentRef.current.showNotification(
+          `Error selling products`,
+          "danger"
+        );
         throw new Error("Failed to sell products");
       }
     } catch (error) {
@@ -212,60 +245,7 @@ const SalesPage = () => {
     <>
       <div className="content">
         <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
-        <Card>
-          <CardHeader>
-            {/* <h5 className="card-category">Sales</h5> */}
-            <Row>
-              <Col className="text-left" sm="3">
-                <h5 className="card-category">Sales</h5>
-
-                {/* <h5 className="card-category">CMS</h5> */}
-                <CardTitle tag="h2">Products</CardTitle>
-              </Col>
-              <Col sm="12" className="text-center">
-                <Button onClick={handlePreviousDay}>&lt;</Button>
-                <span className="mx-1">{selectedDate.toDateString()}</span>
-                <Button onClick={handleNextDay}>&gt;</Button>
-              </Col>
-            </Row>
-          </CardHeader>
-          <CardBody>
-            <Table className="tablesorter productsTable" responsive>
-              <thead className="text-primary">
-                <tr>
-                  {salesTableHeaders.map((header, index) => (
-                    <th key={index}>{header}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sales.map((sale, index) => (
-                  <tr key={index}>
-                    {salesColumns.map((key, index) => (
-                      <td className={key} key={index}>
-                        {sale[key]}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-                <tr>
-                  <td colSpan={salesColumns.length - 1}></td>
-                  {/* <td>Total Sale Price:</td> */}
-                  <td className="text-success text-right">
-                    {/* Calculate and display total sale price */}
-                    {sales
-                      .reduce(
-                        (total, sale) =>
-                          Number(total) + Number(sale.sale_price || 0),
-                        0
-                      )
-                      .toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </CardBody>
-        </Card>
+        <NotificationComponent ref={notificationComponentRef} />
         <Card>
           <CardHeader>
             <Row>
@@ -281,6 +261,7 @@ const SalesPage = () => {
                   handleBrandFilterChange={handleBrandFilterChange}
                   handleSubmit={handleSubmit}
                   handleSale={handleSale}
+                  resetFilteredProducts={resetFilteredProducts}
                 />
               </Col>
             </Row>
@@ -323,6 +304,57 @@ const SalesPage = () => {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Row>
+              <Col className="text-left" sm="3">
+                <h5 className="card-category">Sales</h5>
+                <CardTitle tag="h2">Products</CardTitle>
+              </Col>
+              <Col sm="12" className="text-center">
+                <Button onClick={handlePreviousDay}>&lt;</Button>
+                <span className="mx-1">{selectedDate.toDateString()}</span>
+                <Button onClick={handleNextDay}>&gt;</Button>
+              </Col>
+            </Row>
+          </CardHeader>
+          <CardBody>
+            <Table className="tablesorter productsTable" responsive>
+              <thead className="text-primary">
+                <tr>
+                  {salesTableHeaders.map((header, index) => (
+                    <th key={index}>{header}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sales.map((sale, index) => (
+                  <tr key={index}>
+                    {salesColumns.map((key, index) => (
+                      <td className={key} key={index}>
+                        {sale[key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan={salesColumns.length - 1}></td>
+                  {/* <td>Total Sale Price:</td> */}
+                  <td className="text-success text-right">
+                    {/* Calculate and display total sale price */}
+                    {sales
+                      .reduce(
+                        (total, sale) =>
+                          Number(total) + Number(sale.sale_price || 0),
+                        0
+                      )
+                      .toFixed(2)}
+                  </td>
+                </tr>
               </tbody>
             </Table>
           </CardBody>

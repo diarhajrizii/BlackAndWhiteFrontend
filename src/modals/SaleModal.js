@@ -22,6 +22,7 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
       paymentType: "cash",
       bank: "",
       type: product.type,
+      sale_type: "store",
     }))
   );
 
@@ -53,7 +54,7 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
                   <b> {product.price}€</b>
                 </h5>
               </Col>
-              <Col sm="6">
+              <Col sm="4">
                 <FormGroup>
                   <Label for={`price_${product.id}`}>Price</Label>
                   <Input
@@ -67,7 +68,7 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
                   />
                 </FormGroup>
               </Col>
-              <Col sm="6">
+              <Col sm="4">
                 <FormGroup>
                   <Label for={`paymentType_${product.id}`}>Payment Type</Label>
                   <Input
@@ -86,9 +87,28 @@ const SaleModal = ({ selectedProducts, toggle, sellProducts }) => {
                   </Input>
                 </FormGroup>
               </Col>
+              <Col sm="4">
+                <FormGroup>
+                  <Label for={`sale_${product.id}`}>Sale Type</Label>
+                  <Input
+                    type="select"
+                    id={`sale_${product.id}`}
+                    value={
+                      saleData.find((item) => item.id === product.id)
+                        ?.sale_type || "store"
+                    }
+                    onChange={(e) =>
+                      handleInputChange(e, product.id, "sale_type")
+                    }
+                  >
+                    <option value="store">Store</option>
+                    <option value="online">Online</option>
+                  </Input>
+                </FormGroup>
+              </Col>
               {saleData.find((item) => item.id === product.id)?.paymentType ===
                 "bank" && (
-                <Col sm="6">
+                <Col sm="12">
                   <FormGroup>
                     <Label for={`bank_${product.id}`}>Bank</Label>
                     <Input

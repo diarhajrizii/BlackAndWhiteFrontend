@@ -14,6 +14,7 @@ const FilterForm = ({
   openTransferModal,
   selectAll,
   handleSale,
+  resetFilteredProducts,
 }) => (
   <Form onSubmit={handleSubmit}>
     {startDate !== undefined && endDate !== undefined && (
@@ -79,13 +80,17 @@ const FilterForm = ({
         )}
         {handleSale !== undefined && (
           <Button size="sm" color="success" onClick={handleSale}>
-            Sale
+            Sell
           </Button>
         )}
-
         <Button size="sm" color="primary" type="submit">
           Filter
         </Button>
+        {resetFilteredProducts !== undefined && (
+          <Button size="sm" color="danger" onClick={resetFilteredProducts}>
+            Reset
+          </Button>
+        )}
       </Col>
     </Row>
   </Form>
