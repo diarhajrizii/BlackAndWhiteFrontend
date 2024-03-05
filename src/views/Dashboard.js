@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-// nodejs library that concatenates classes
-import classNames from "classnames";
-// react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
 
-// reactstrap components
 import {
   Button,
-  ButtonGroup,
   Card,
   CardHeader,
   CardBody,
@@ -25,36 +20,81 @@ import {
   UncontrolledTooltip,
 } from "reactstrap";
 
-// core components
 import {
   chartExample1,
   chartExample2,
   chartExample3,
   chartExample4,
 } from "variables/charts.js";
-import { chartExample21 } from "variables/charts";
+
+import YearDatePicker from "../components/datepickers/YearDatePicker";
+import ButtonGroupComponent from "components/Buttons/ButtonGroups";
 
 function Dashboard(props) {
-  const [bigChartData, setbigChartData] = React.useState("data1");
-  const setBgChartData = (name) => {
-    setbigChartData(name);
+  const [shipmentsChartData, setShipmentsChartData] = useState(null);
+  const [quantityChartData, setQuantityChartData] = useState(null);
+  const [onlineShipmentsChartData, setOnlineShipmentsChartData] =
+    useState(null);
+
+  const [activeButton, setActiveButton] = useState("sales");
+
+  const handleButtonClick = (button) => {
+    fetchShipmentsChartData({ type: button, years: [2024] });
+    setActiveButton(button);
   };
-  const [chartData, setChartData] = useState(null);
+
+  const fetchShipmentsChartData = async ({ type, years }) => {
+    try {
+      const data1 = await chartExample1.data1({
+        canvas: document.createElement("canvas"),
+        type,
+        years: years,
+      });
+      setShipmentsChartData(data1);
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
+
+  const fetchQuantityChartData = async ({ type, year }) => {
+    try {
+      const data1 = await chartExample2.data1({
+        type,
+        canvas: document.createElement("canvas"),
+        year,
+      });
+      setQuantityChartData({ data1, totalQuantity: data1.totalQuantity });
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
+
+  const fetchOnlineShipmentsChartData = async ({ type, year }) => {
+    try {
+      const data1 = await chartExample3.data1({
+        type,
+        canvas: document.createElement("canvas"),
+        year,
+      });
+
+      setOnlineShipmentsChartData({
+        data1,
+        totalQuantity: data1.totalQuantity,
+      });
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data1 = await chartExample21.data1(
-          document.createElement("canvas")
-        );
-        setChartData(data1);
-      } catch (error) {
-        console.error("Error fetching chart data:", error);
-      }
-    };
-
-    fetchData();
+    fetchShipmentsChartData({ type: "Default", years: [2024] });
+    fetchQuantityChartData({ type: "quantity", year: [2024] });
+    fetchOnlineShipmentsChartData({ type: "onlinePrices", year: [2024] });
   }, []);
+
+  const onYearsChange = (onYearsChange) => {
+    fetchShipmentsChartData({ type: activeButton, years: onYearsChange });
+  };
 
   return (
     <>
@@ -64,79 +104,29 @@ function Dashboard(props) {
             <Card className="card-chart">
               <CardHeader>
                 <Row>
-                  <Col className="text-left" sm="6">
+                  <Col className="text-left" sm="4">
                     <h5 className="card-category">Total Shipments</h5>
                     <CardTitle tag="h2">Performance</CardTitle>
                   </Col>
-                  <Col sm="6">
-                    <ButtonGroup
-                      className="btn-group-toggle float-right"
-                      data-toggle="buttons"
-                    >
-                      <Button
-                        tag="label"
-                        className={classNames("btn-simple", {
-                          active: bigChartData === "data1",
-                        })}
-                        color="info"
-                        id="0"
-                        size="sm"
-                        onClick={() => setBgChartData("data1")}
-                      >
-                        <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                          Accounts
-                        </span>
-                        <span className="d-block d-sm-none">
-                          <i className="tim-icons icon-single-02" />
-                        </span>
-                      </Button>
-                      <Button
-                        color="info"
-                        id="1"
-                        size="sm"
-                        tag="label"
-                        className={classNames("btn-simple", {
-                          active: bigChartData === "data2",
-                        })}
-                        onClick={() => setBgChartData("data2")}
-                      >
-                        <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                          Purchases
-                        </span>
-                        <span className="d-block d-sm-none">
-                          <i className="tim-icons icon-gift-2" />
-                        </span>
-                      </Button>
-                      <Button
-                        color="info"
-                        id="2"
-                        size="sm"
-                        tag="label"
-                        className={classNames("btn-simple", {
-                          active: bigChartData === "data3",
-                        })}
-                        onClick={() => setBgChartData("data3")}
-                      >
-                        <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                          Sessions
-                        </span>
-                        <span className="d-block d-sm-none">
-                          <i className="tim-icons icon-tap-02" />
-                        </span>
-                      </Button>
-                    </ButtonGroup>
+                  <Col sm="4">
+                    <YearDatePicker onYearsChange={onYearsChange} />
+                  </Col>
+                  <Col sm="4">
+                    <ButtonGroupComponent
+                      activeButton={activeButton}
+                      onButtonClick={handleButtonClick}
+                      buttons={["sales", "shoes", "textile"]}
+                    />
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
                 <div className="chart-area">
-                  {/* <Line
-                    data={chartExample1[bigChartData]}
-                    options={chartExample1.options}
-                  /> */}
-
-                  {chartData && (
-                    <Line data={chartData} options={chartExample1.options} />
+                  {shipmentsChartData && (
+                    <Line
+                      data={shipmentsChartData}
+                      options={chartExample1.options}
+                    />
                   )}
                 </div>
               </CardBody>
@@ -149,15 +139,18 @@ function Dashboard(props) {
               <CardHeader>
                 <h5 className="card-category">Total Shipments</h5>
                 <CardTitle tag="h3">
-                  <i className="tim-icons icon-bell-55 text-info" /> 763,215
+                  <i className="tim-icons icon-bell-55 text-info" />{" "}
+                  {quantityChartData ? quantityChartData.totalQuantity : 0} Qty
                 </CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="chart-area">
-                  <Line
-                    data={chartExample2.data}
-                    options={chartExample2.options}
-                  />
+                  {quantityChartData && (
+                    <Line
+                      data={quantityChartData.data1}
+                      options={chartExample2.options}
+                    />
+                  )}
                 </div>
               </CardBody>
             </Card>
@@ -168,15 +161,20 @@ function Dashboard(props) {
                 <h5 className="card-category">Daily Sales</h5>
                 <CardTitle tag="h3">
                   <i className="tim-icons icon-delivery-fast text-primary" />{" "}
-                  3,500€
+                  {onlineShipmentsChartData
+                    ? onlineShipmentsChartData.totalQuantity
+                    : 0}
+                  {"€"}
                 </CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="chart-area">
-                  <Bar
-                    data={chartExample3.data}
-                    options={chartExample3.options}
-                  />
+                  {onlineShipmentsChartData && (
+                    <Bar
+                      data={onlineShipmentsChartData.data1}
+                      options={chartExample3.options}
+                    />
+                  )}
                 </div>
               </CardBody>
             </Card>
