@@ -11,6 +11,7 @@ import CMSPanel from "views/CmsPanels.js";
 import ProductsList from "views/ProductsList";
 import SalesPage from "views/Sales";
 import AdministrationPanel from "views/AdministrationPanel";
+import LogIn from "views/LogIn";
 
 var routes = [
   {
@@ -20,6 +21,7 @@ var routes = [
     icon: "tim-icons icon-chart-pie-36",
     component: <Dashboard />,
     layout: "/admin",
+    authentication: true,
   },
   {
     path: "/sales",
@@ -28,6 +30,7 @@ var routes = [
     icon: "tim-icons icon-paper",
     component: <SalesPage />,
     layout: "/admin",
+    authentication: true,
   },
   // {
   //   path: "/products",
@@ -62,8 +65,8 @@ var routes = [
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-chart-pie-36",
     component: <AddProducts />,
-    // redirect: true,
     layout: "/admin",
+    authentication: true,
   },
 
   {
@@ -73,6 +76,7 @@ var routes = [
     icon: "tim-icons icon-bag-16",
     component: <ProductsList />,
     layout: "/admin",
+    authentication: true,
   },
 
   {
@@ -81,8 +85,8 @@ var routes = [
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-chart-pie-36",
     component: <CMSPanel />,
-    // redirect: true,
     layout: "/admin",
+    authentication: true,
   },
 
   {
@@ -91,8 +95,8 @@ var routes = [
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-settings-gear-63",
     component: <AdministrationPanel />,
-    // redirect: true,
     layout: "/admin",
+    authentication: true,
   },
 
   {
@@ -101,8 +105,8 @@ var routes = [
     rtlName: "الرموز",
     icon: "tim-icons icon-atom",
     component: <Icons />,
-    // redirect: true,
     layout: "/admin",
+    authentication: true,
   },
   // {
   //   path: "/map",
@@ -113,14 +117,15 @@ var routes = [
   //   // redirect: true,
   //   layout: "/admin",
   // },
+
   {
     path: "/notifications",
     name: "Notifications",
     rtlName: "إخطارات",
     icon: "tim-icons icon-bell-55",
     component: <Notifications />,
-    // redirect: true,
     layout: "/admin",
+    authentication: true,
   },
   {
     path: "/user-profile",
@@ -128,8 +133,18 @@ var routes = [
     rtlName: "ملف تعريفي للمستخدم",
     icon: "tim-icons icon-single-02",
     component: <UserProfile />,
-    // redirect: true,
+    authentication: false,
     layout: "/admin",
+  },
+  {
+    path: "/login",
+    name: "Log In",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: "tim-icons icon-single-02",
+    component: <LogIn />,
+    redirect: true,
+    layout: "/admin",
+    authentication: false,
   },
   {
     path: "/tables",
@@ -137,7 +152,6 @@ var routes = [
     rtlName: "قائمة الجدول",
     icon: "tim-icons icon-puzzle-10",
     component: <TableList />,
-    // redirect: true,
     layout: "/admin",
   },
   // {

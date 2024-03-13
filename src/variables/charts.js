@@ -77,41 +77,64 @@ let chartExample1 = {
 
     try {
       const salesData = await fetchSalesData(years, type);
+      let datasets;
+      if (salesData.length > 1) {
+        datasets = salesData.map((data) => ({
+          label: data.year.toString(),
+          fill: true,
 
-      const datasets = salesData.map((data) => ({
-        label: data.year.toString(),
-        fill: true,
+          backgroundColor: `rgba(${Math.floor(
+            Math.random() * 256
+          )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
+            Math.random() * 256
+          )}, 0.4)`,
+          borderColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
+            Math.random() * 256
+          )}, ${Math.floor(Math.random() * 256)}, 1)`,
+          borderWidth: 1,
+          hoverBackgroundColor: `rgba(${Math.floor(
+            Math.random() * 256
+          )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
+            Math.random() * 256
+          )}, 0.8)`,
 
-        backgroundColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, 0.4)`,
-        borderColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, 1)`,
-        borderWidth: 1,
-        hoverBackgroundColor: `rgba(${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, 0.8)`,
-
-        hoverBorderColor: `rgba(${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, 1)`,
-        data: data.salesArray,
-        pointBackgroundColor: "#1f8ef1",
-        pointBorderColor: "rgba(255,255,255,0)",
-        pointHoverBackgroundColor: "#1f8ef1",
-        pointBorderWidth: 20,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 10,
-        pointRadius: 4,
-        borderDash: [],
-        borderDashOffset: 0.0,
-      }));
-
+          hoverBorderColor: `rgba(${Math.floor(
+            Math.random() * 256
+          )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
+            Math.random() * 256
+          )}, 1)`,
+          data: data.salesArray,
+          pointBackgroundColor: "#1f8ef1",
+          pointBorderColor: "rgba(255,255,255,0)",
+          pointHoverBackgroundColor: "#1f8ef1",
+          pointBorderWidth: 20,
+          pointHoverRadius: 4,
+          pointHoverBorderWidth: 10,
+          pointRadius: 4,
+          borderDash: [],
+          borderDashOffset: 0.0,
+        }));
+      } else {
+        datasets = [
+          {
+            label: salesData[0].year,
+            fill: true,
+            backgroundColor: gradientStroke,
+            borderColor: "#1f8ef1",
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            pointBackgroundColor: "#1f8ef1",
+            pointBorderColor: "rgba(255,255,255,0)",
+            pointHoverBackgroundColor: "#1f8ef1",
+            pointBorderWidth: 20,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 15,
+            pointRadius: 4,
+            data: salesData[0].salesArray,
+          },
+        ];
+      }
       return {
         labels: [
           "JAN",

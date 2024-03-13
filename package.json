@@ -16,10 +16,10 @@
     "classnames": "2.3.2",
     "perfect-scrollbar": "1.5.5",
     "prop-types": "15.8.1",
-    "react": ">=16.8.0",
+    "react": "^18.2.0",
     "react-barcode": "^1.4.6",
     "react-chartjs-2": "3.3.0",
-    "react-dom": ">=16.8.0",
+    "react-dom": "^18.2.0",
     "react-notification-alert": "0.0.13",
     "react-router-dom": "6.11.1",
     "react-scripts": "5.0.1",
@@ -37,10 +37,6 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
   },
   "browserslist": [
     ">0.2%",
