@@ -35,6 +35,7 @@ function Dashboard(props) {
   const [quantityChartData, setQuantityChartData] = useState(null);
   const [onlineShipmentsChartData, setOnlineShipmentsChartData] =
     useState(null);
+  const [bankPaymentChartData, setBankPaymentChartData] = useState(null);
 
   const [activeButton, setActiveButton] = useState("sales");
 
@@ -69,6 +70,22 @@ function Dashboard(props) {
     }
   };
 
+  const fetchBankPaymentChartData = async ({ type, year }) => {
+    try {
+      const data1 = await chartExample4.data1({
+        type,
+        canvas: document.createElement("canvas"),
+        year,
+      });
+      setBankPaymentChartData({
+        data1,
+        totalBankPayment: data1.totalBankPayment,
+      });
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
+
   const fetchOnlineShipmentsChartData = async ({ type, year }) => {
     try {
       const data1 = await chartExample3.data1({
@@ -90,6 +107,7 @@ function Dashboard(props) {
     fetchShipmentsChartData({ type: "Default", years: [2024] });
     fetchQuantityChartData({ type: "quantity", year: [2024] });
     fetchOnlineShipmentsChartData({ type: "onlinePrices", year: [2024] });
+    fetchBankPaymentChartData({ type: "bankPrices", year: [2024] });
   }, []);
 
   const onYearsChange = (onYearsChange) => {
@@ -158,7 +176,7 @@ function Dashboard(props) {
           <Col lg="4">
             <Card className="card-chart">
               <CardHeader>
-                <h5 className="card-category">Daily Sales</h5>
+                <h5 className="card-category">Online Sales</h5>
                 <CardTitle tag="h3">
                   <i className="tim-icons icon-delivery-fast text-primary" />{" "}
                   {onlineShipmentsChartData
@@ -182,17 +200,23 @@ function Dashboard(props) {
           <Col lg="4">
             <Card className="card-chart">
               <CardHeader>
-                <h5 className="card-category">Completed Tasks</h5>
+                <h5 className="card-category">Bank Payments</h5>
                 <CardTitle tag="h3">
-                  <i className="tim-icons icon-send text-success" /> 12,100K
+                  <i className="tim-icons icon-bank text-success" />
+                  {bankPaymentChartData
+                    ? bankPaymentChartData.totalBankPayment
+                    : 0}
+                  {"€"}
                 </CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="chart-area">
-                  <Line
-                    data={chartExample4.data}
-                    options={chartExample4.options}
-                  />
+                  {bankPaymentChartData && (
+                    <Line
+                      data={bankPaymentChartData.data1}
+                      options={chartExample4.options}
+                    />
+                  )}
                 </div>
               </CardBody>
             </Card>

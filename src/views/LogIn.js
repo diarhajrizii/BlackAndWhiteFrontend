@@ -69,10 +69,10 @@ const LogIn = () => {
                 className="imageContainer"
                 md="12"
               >
-                <img style={{ width: "50%" }} alt="..." src={image} />
+                <img style={{ width: "45%" }} alt="..." src={image} />
               </Col>
               <Col style={{ textAlign: "center", fontSize: "20px" }} md="12">
-                Sign in to Black & White
+                Sign in to Black & White CMS
               </Col>
             </CardHeader>
             <CardBody>
@@ -135,7 +135,7 @@ const LogIn = () => {
                       </Button>
                     )}
                   </Col>
-                  <Col sm="12" className="text-center mt-5 mb-5">
+                  <Col sm="12" className="text-center mt-4 mb-4">
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <hr style={{ flexGrow: 1 }} />
                       <span style={{ padding: "0 10px", fontSize: "18px" }}>

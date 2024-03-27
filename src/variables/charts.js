@@ -334,7 +334,7 @@ let chartExample3 = {
         ],
         datasets: [
           {
-            label: "2023",
+            label: "2024",
             fill: true,
             backgroundColor: gradientStroke,
             hoverBackgroundColor: gradientStroke,
@@ -446,6 +446,62 @@ let chartExample3 = {
 };
 
 const chartExample4 = {
+  data1: async ({ canvas, type, year }) => {
+    let ctx = canvas.getContext("2d");
+
+    let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, "rgba(66,134,121,0.15)");
+    gradientStroke.addColorStop(0.4, "rgba(66,134,121,0.0)"); //green colors
+    gradientStroke.addColorStop(0, "rgba(66,134,121,0)"); //green colors
+
+    try {
+      const [salesData] = await fetchSalesData(year, type);
+      const totalBankPayment = salesData.salesArray.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      );
+
+      return {
+        totalBankPayment,
+        labels: [
+          "JAN",
+          "FEB",
+          "MAR",
+          "APR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AUG",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DEC",
+        ],
+        datasets: [
+          {
+            label: "2024",
+            fill: true,
+            backgroundColor: gradientStroke,
+            borderColor: "#00d6b4",
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            pointBackgroundColor: "#00d6b4",
+            pointBorderColor: "rgba(255,255,255,0)",
+            pointHoverBackgroundColor: "#00d6b4",
+            pointBorderWidth: 20,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 15,
+            pointRadius: 4,
+            data: salesData.salesArray,
+          },
+        ],
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  },
   data: (canvas) => {
     let ctx = canvas.getContext("2d");
 
