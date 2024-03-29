@@ -157,7 +157,7 @@ const AddItemModal = ({
                   type="select"
                   name="type"
                   id="type"
-                  value={editItemData.type || "shoes"}
+                  value={editItemData.type}
                   onChange={handleInputChange}
                 >
                   <option value="shoes">Shoes</option>

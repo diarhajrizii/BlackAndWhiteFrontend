@@ -10,6 +10,7 @@ function ProductForm({
   typeOptions,
   handleChange,
   handleSizeQuantityChange,
+  numberOptions,
 }) {
   return (
     <Form>
@@ -106,7 +107,7 @@ function ProductForm({
       </Row>
 
       <Row>
-        {Object.keys(formData.sizes).map((size) => (
+        {Object.keys(numberOptions).map((size) => (
           <Col md="2" key={size}>
             <FormGroup>
               <label>Size {size}</label>

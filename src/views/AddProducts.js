@@ -13,12 +13,19 @@ import {
 import ButtonGroupComponent from "components/Buttons/ButtonGroups";
 import ProductForm from "components/Forms/ProductForm";
 import NotificationComponent from "../components/Alert/alert";
-import { fetchPanelData } from "api";
+
+import {
+  useFetchBrandsQuery,
+  useFetchColorsQuery,
+  useFetchNumbersQuery,
+  useFetchTypesQuery,
+  useAddProductMutation,
+} from "apiSlice"; // Adjust the path accordingly
 import AccessoriesForm from "components/Forms/AccessoriesForm";
 
 function AddProducts() {
   // Ref for the NotificationComponent
-  const notificationComponentRef = useRef(new NotificationComponent());
+  const notificationComponentRef = useRef();
 
   // State variables
   const [formData, setFormData] = useState({
@@ -33,56 +40,36 @@ function AddProducts() {
     productType: "shoes",
   });
 
-  const [brandOptions, setBrandOptions] = useState([]);
-  const [colorOptions, setColorOptions] = useState([]);
-  const [typeOptions, setTypeOptions] = useState([]);
-  const [activeButton, setActiveButton] = useState("");
+  const [activeButton, setActiveButton] = useState("shoes");
 
-  // Fetch data from APIs on component mount
+  // RTK Query hooks
+  const { data: brandOptions } = useFetchBrandsQuery(activeButton);
+  const { data: colorOptions } = useFetchColorsQuery();
+  const { data: typeOptions } = useFetchTypesQuery(activeButton);
+  const { data: numberData } = useFetchNumbersQuery(activeButton);
+
   useEffect(() => {
-    fetchDataFromAPIs("shoes");
-  }, []);
+    if (
+      (brandOptions?.data && colorOptions?.data && typeOptions?.data,
+      numberData?.data)
+    ) {
+      // Set default values for brand, color, and type
+      setFormData((prevData) => ({
+        ...prevData,
+        brand: brandOptions.data[0]?.id || 0, // Set the first brand option as default, or 0 if no options
+        type: typeOptions.data[0]?.id || 0, // Set the first type option as default, or 0 if no options
+        color: colorOptions.data[0]?.id || 0, // Set the first color option as default, or 0 if no options
+        sizes: Object.fromEntries(
+          numberData?.data.map((number) => [number.number, 0])
+        ),
+        productType: activeButton,
+      }));
+    }
+  }, [brandOptions, colorOptions, typeOptions]);
 
-  // Function to fetch data from APIs
-  // Function to fetch data from APIs
+  // // Function to fetch data from APIs
   const fetchDataFromAPIs = async (button) => {
     try {
-      let brandData, colorData, numberData, typeData;
-
-      const filterType = `?type=${button}`;
-      if (button !== "accessories") {
-        // Fetch data for shoes and textile types
-        [brandData, colorData, numberData, typeData] = await Promise.all([
-          fetchPanelData(`/api/v1/panels/brands${filterType}`),
-          fetchPanelData("/api/v1/panels/colors"),
-          fetchPanelData(`/api/v1/panels/numbers${filterType}`),
-          fetchPanelData(`/api/v1/panels/types${filterType}`),
-        ]);
-      } else {
-        // Fetch only brandData for accessories
-        brandData = await fetchPanelData(`/api/v1/panels/brands${filterType}`);
-        colorData = { data: { data: [] } };
-        numberData = { data: { data: [] } };
-        typeData = { data: { data: [] } };
-      }
-
-      // Update state with fetched data
-      setBrandOptions(brandData.data.data);
-      setColorOptions(colorData.data.data);
-      setTypeOptions(typeData.data.data);
-
-      setFormData((prevData) => ({
-        // Uncomment if you want to not reset inputs value when changing type
-        ...prevData,
-        code: "",
-        brand: brandData.data.data[0]?.id || 0,
-        type: typeData.data.data[0]?.id || 0,
-        color: colorData.data.data[0]?.id || 0,
-        sizes: Object.fromEntries(
-          numberData.data.data.map((number) => [number.number, 0])
-        ),
-        productType: button,
-      }));
       setActiveButton(button);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -108,12 +95,8 @@ function AddProducts() {
     }));
   };
 
-  // Handle button click to switch product type
-  const handleButtonClick = (button) => {
-    if (button !== activeButton) {
-      fetchDataFromAPIs(button);
-    }
-  };
+  // RTK Query Mutation
+  // const addProductMutation = useAddProductMutation();
 
   // Handle save button click
   const handleSave = async () => {
@@ -146,6 +129,7 @@ function AddProducts() {
           );
         }
       });
+
       // Prepare sizes data
       const sizesData = Object.entries(formData.sizes).map(
         ([size, quantity]) => ({
@@ -195,6 +179,13 @@ function AddProducts() {
     }
   };
 
+  const numberObject = numberData
+    ? Object.fromEntries(numberData?.data.map((number) => [number.number, 0]))
+    : null;
+
+  const isDataLoaded =
+    brandOptions && colorOptions && typeOptions && numberObject;
+
   return (
     <div className="content">
       {/* NotificationComponent for displaying alerts */}
@@ -214,32 +205,36 @@ function AddProducts() {
                   {/* ButtonGroupComponent for switching product types */}
                   <ButtonGroupComponent
                     activeButton={activeButton}
-                    onButtonClick={handleButtonClick}
+                    onButtonClick={fetchDataFromAPIs}
                     buttons={["shoes", "textile", "accessories"]}
                   />
                 </Col>
               </Row>
             </CardHeader>
             <CardBody>
-              {/* Form for entering product details */}
-              {activeButton && activeButton !== "accessories" && (
-                <ProductForm
-                  formData={formData}
-                  brandOptions={brandOptions}
-                  colorOptions={colorOptions}
-                  typeOptions={typeOptions}
-                  handleChange={handleChange}
-                  handleSizeQuantityChange={handleSizeQuantityChange}
-                  productType={activeButton}
-                />
-              )}
-              {activeButton && activeButton === "accessories" && (
-                <AccessoriesForm
-                  formData={formData}
-                  brandOptions={brandOptions}
-                  handleChange={handleChange}
-                />
-              )}
+              {isDataLoaded &&
+                activeButton &&
+                activeButton !== "accessories" && (
+                  <ProductForm
+                    formData={formData}
+                    brandOptions={brandOptions?.data}
+                    colorOptions={colorOptions?.data}
+                    typeOptions={typeOptions?.data}
+                    handleChange={handleChange}
+                    numberOptions={numberObject}
+                    handleSizeQuantityChange={handleSizeQuantityChange}
+                    productType={activeButton}
+                  />
+                )}
+              {isDataLoaded &&
+                activeButton &&
+                activeButton === "accessories" && (
+                  <AccessoriesForm
+                    formData={formData}
+                    brandOptions={brandOptions?.data}
+                    handleChange={handleChange}
+                  />
+                )}
             </CardBody>
             <CardFooter style={{ textAlign: "right" }}>
               {/* Save button to submit the form */}

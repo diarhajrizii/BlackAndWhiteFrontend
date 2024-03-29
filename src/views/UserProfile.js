@@ -1,4 +1,5 @@
-import React from "react";
+import { useFetchUserDataQuery } from "apiSlice";
+import React, { useEffect, useState } from "react";
 
 // reactstrap components
 import {
@@ -16,6 +17,19 @@ import {
 } from "reactstrap";
 
 function UserProfile() {
+  const [userData, setUserData] = useState({});
+  const { data: userDataResponse, error, isLoading } = useFetchUserDataQuery(); // Fetch user data using the generated hook
+
+  useEffect(() => {
+    if (userDataResponse) {
+      setUserData(userDataResponse.data);
+    }
+  }, [userDataResponse]);
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>Error: {error.message}</div>;
+  console.log(userData.username);
   return (
     <>
       <div className="content">
@@ -23,7 +37,8 @@ function UserProfile() {
           <Col md="8">
             <Card>
               <CardHeader>
-                <h5 className="title">Edit Profile</h5>
+                {userData.username}
+                <h5 className="title">Edit Profile </h5>
               </CardHeader>
               <CardBody>
                 <Form>
