@@ -18,8 +18,6 @@ const useBarcodeScanner = (callback) => {
 
     const handleBarcodeScanner = (event) => {
       if (event.key === "Enter" && scannedCode.length > 0) {
-        console.log("Scanned barcode:", scannedCode);
-
         if (typeof callback === "function") {
           callback(scannedCode);
         }
@@ -40,7 +38,6 @@ const useBarcodeScanner = (callback) => {
 const ProductList = () => {
   const [product, setProduct] = useState(null);
   const [barcode, setBarcode] = useState("");
-  console.log(barcode);
   const handleBarcodeScanner = async (e) => {
     try {
       const response = await fetch(`/api/v1/products/products/${barcode}`);

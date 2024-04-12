@@ -13,17 +13,17 @@ import {
 } from "reactstrap";
 import "./modal.css";
 import {
-  saveColorData,
-  saveBrandData,
-  saveSpecificTypeData,
-  saveNumberData,
-  editBrandData,
-  editColorData,
-  editNumberData,
-  editTypeData,
-  saveLocationsData,
-  editLocationData,
-} from "../api.js"; // Import API functions
+  useSaveColorDataMutation,
+  useSaveBrandDataMutation,
+  useSaveNumberDataMutation,
+  useSaveSpecificTypeDataMutation,
+  useSaveLocationsDataMutation,
+  useEditColorDataMutation,
+  useEditBrandDataMutation,
+  useEditNumberDataMutation,
+  useEditTypeDataMutation,
+  useEditLocationDataMutation,
+} from "apiSlice";
 
 const AddItemModal = ({
   modalOpen,
@@ -36,6 +36,18 @@ const AddItemModal = ({
   notificationComponentRef,
   tableData,
 }) => {
+  const [saveColorData] = useSaveColorDataMutation();
+  const [saveBrandData] = useSaveBrandDataMutation();
+  const [saveNumberData] = useSaveNumberDataMutation();
+  const [saveLocationsData] = useSaveLocationsDataMutation();
+  const [editBrandData] = useEditBrandDataMutation();
+  const [editTypeData] = useEditTypeDataMutation();
+  const [editColorData] = useEditColorDataMutation();
+  const [editNumberData] = useEditNumberDataMutation();
+  const [editLocationData] = useEditLocationDataMutation();
+  const [saveSpecificTypeData] = useSaveSpecificTypeDataMutation();
+  const [loading, setLoading] = useState(false);
+
   let modalTitle = "";
   const [formData, setFormData] = useState({});
 
@@ -95,6 +107,7 @@ const AddItemModal = ({
   const handleSubmit = async () => {
     try {
       let data;
+      setLoading(true);
       if (!editItemData.id) {
         switch (itemType) {
           case "brands":
@@ -115,7 +128,8 @@ const AddItemModal = ({
           default:
             break;
         }
-        const newObj = { id: data.data, ...formData };
+
+        const newObj = { id: data.data.data, ...formData };
         addNewItem(newObj);
       } else {
         switch (itemType) {
@@ -139,8 +153,11 @@ const AddItemModal = ({
         }
         updateItemProperty(formData, tableData);
       }
+      setLoading(false);
     } catch (error) {
+      console.log(error);
       console.error("Error saving data:", error);
+      setLoading(false);
     }
   };
 
@@ -297,8 +314,8 @@ const AddItemModal = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={handleSubmit}>
-          Save
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
+          {loading ? "Saving..." : "Save"}
         </Button>
         <Button color="secondary" onClick={toggleModal}>
           Cancel

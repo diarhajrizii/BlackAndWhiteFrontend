@@ -27,7 +27,7 @@ function CMSPanel() {
     try {
       const response = await fetch(`/api/v1/panels/${button}`);
       const responseData = await response.json();
-      setTableData(responseData.success ? responseData.data.data : []);
+      setTableData(responseData.success ? responseData.data : []);
       setActiveButton(button);
     } catch (error) {
       console.error("Error fetching data:", error);

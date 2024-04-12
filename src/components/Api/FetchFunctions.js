@@ -23,7 +23,7 @@ export const fetchLocations = async () => {
     const response = await fetch(`/api/v1/panels/locations`);
     if (response.ok) {
       const { data: responseData } = await response.json();
-      return responseData.data;
+      return responseData;
     } else {
       throw new Error("Failed to fetch locations");
     }

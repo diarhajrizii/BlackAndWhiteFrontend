@@ -10,7 +10,6 @@ const PrivateRoute = ({ element }) => {
     // You might want to render a loading spinner or some indicator while checking the token
     return <div>Loading...</div>;
   }
-  console.log(token, "Token");
   return token ? element : <Navigate to="/admin/login" />;
 };
 

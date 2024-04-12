@@ -33,6 +33,10 @@ const deleteItemModal = ({
       modalTitle = "Delete Type";
       name = "type";
       break;
+    case "locations":
+      modalTitle = "Delete Location";
+      name = "location";
+      break;
     default:
       modalTitle = "";
       name = "";
@@ -41,6 +45,7 @@ const deleteItemModal = ({
   const handleSubmit = async () => {
     try {
       const deletedID = editItemData.id;
+
       await deleteItem(name, { id: deletedID });
 
       let filteredProducts = tableData.filter(

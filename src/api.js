@@ -147,7 +147,6 @@ const deleteItem = async (endpoint, data) => {
 
 const transferProducts = async (ids, location) => {
   try {
-    console.log({ location });
     const response = await fetch(`/api/v1/products/transfer`, {
       method: "put",
       headers: {

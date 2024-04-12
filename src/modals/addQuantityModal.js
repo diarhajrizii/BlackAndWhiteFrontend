@@ -51,8 +51,6 @@ const AddQuantityModal = ({
 
   const handleSubmit = async () => {
     try {
-      console.log(formData);
-
       await insertQuantityData(formData);
 
       updateQuantity(formData.articleId, formData.quantity);

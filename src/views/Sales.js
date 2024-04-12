@@ -216,7 +216,6 @@ const SalesPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Sale Data:", data);
         setShowSaleModal(false); // Close the modal after handling the sale data
         removeSalesProduct(saleData);
 

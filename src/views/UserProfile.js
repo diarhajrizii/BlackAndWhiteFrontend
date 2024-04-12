@@ -29,7 +29,6 @@ function UserProfile() {
   if (isLoading) return <div>Loading...</div>;
 
   if (error) return <div>Error: {error.message}</div>;
-  console.log(userData.username);
   return (
     <>
       <div className="content">
