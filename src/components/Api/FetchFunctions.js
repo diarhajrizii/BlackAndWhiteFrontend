@@ -34,6 +34,20 @@ export const fetchLocations = async () => {
 };
 export const fetchSalesData = async (date) => {
   try {
+    const response = await fetch(`/api/v1/transactions/sales?date=${date}`);
+    if (response.ok) {
+      const responseData = await response.json();
+      return responseData.data.data;
+    } else {
+      throw new Error("Failed to fetch sales data");
+    }
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    // Handle errors or show a message to the user
+  }
+};
+export const fetchTransactionsData = async (date) => {
+  try {
     const response = await fetch(`/api/v1/transactions?date=${date}`);
     if (response.ok) {
       const responseData = await response.json();
@@ -41,6 +55,27 @@ export const fetchSalesData = async (date) => {
     } else {
       throw new Error("Failed to fetch sales data");
     }
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    // Handle errors or show a message to the user
+  }
+};
+export const fetchTransactionsTypes = async (date) => {
+  try {
+    // const response = await fetch(`/api/v1/transactions?date=${date}`);
+    // if (response.ok) {
+    //   const responseData = await response.json();
+    //   return responseData.data.data;
+    // } else {
+    //   throw new Error("Failed to fetch sales data");
+    // }
+
+    // Example just for testing function
+    return [
+      { name: "Taxes", price: 60 },
+      { name: "Energy", price: false },
+      { name: "Administration", price: false },
+    ];
   } catch (error) {
     console.error("Error fetching sales data:", error);
     // Handle errors or show a message to the user

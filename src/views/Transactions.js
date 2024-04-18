@@ -8,25 +8,36 @@ import {
   Table,
   CardTitle,
   Button,
+  FormGroup,
+  Label,
+  Input,
 } from "reactstrap";
 import {
   fetchProducts,
   fetchTransactionsData,
+  fetchTransactionsTypes,
 } from "components/Api/FetchFunctions";
 import FilterForm from "./../components/Forms/FilterForms";
 import BarcodeScanner from "components/Barcode/ScannerCode";
 import SaleModal from "modals/SaleModal";
 import NotificationComponent from "components/Alert/alert";
+import AddItemModal from "modals/addTransactionModal";
 
-const SalesPage = () => {
+const Transactions = () => {
   // States for product search and sales data
   const notificationComponentRef = useRef(new NotificationComponent());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [editItemData, setEditItemData] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [codeFilter, setCodeFilter] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [sales, setSales] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [transactionsType, setTransactionsType] = useState([]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   // Constants
   const columns = [
@@ -49,7 +60,7 @@ const SalesPage = () => {
     "Quantity",
     "Price",
   ];
-  const salesColumns = [
+  const transactionsColumns = [
     "id",
     "brand_name",
     "color_name",
@@ -62,7 +73,7 @@ const SalesPage = () => {
     "sale_price",
   ];
 
-  const salesTableHeaders = [
+  const transactionsTableHeaders = [
     "ID",
     "Brand",
     "Color",
@@ -82,32 +93,25 @@ const SalesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const formattedDate = selectedDate.toISOString().split("T")[0];
-        const fetchedSalesData = await fetchTransactionsData(formattedDate);
-        setSales(fetchedSalesData);
+        const fetchedSalesData = await fetchTransactionsData(startDate);
+        setTableData(fetchedSalesData);
         if (!products.length) {
-          const fetchedProducts = await fetchProducts("sales", formattedDate);
+          const fetchedProducts = await fetchProducts("sales", startDate);
           setProducts(fetchedProducts);
         }
+        const fetchedTransactionsType = await fetchTransactionsTypes();
+        setTransactionsType(fetchedTransactionsType);
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchData();
-  }, [selectedDate]);
+  }, [startDate]);
 
-  // Handlers
-  const handlePreviousDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() - 1);
-    setSelectedDate(newDate);
-  };
-
-  const handleNextDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() + 1);
-    setSelectedDate(newDate);
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
+    setSelectedDate(event.target.value);
   };
 
   const resetFilteredProducts = () => {
@@ -193,6 +197,12 @@ const SalesPage = () => {
     }
   };
 
+  const toggleModal = (itemType) => {
+    setEditItemData({});
+    // setModalItemType(itemType);
+    setModalOpen(!modalOpen);
+  };
+
   const handleAllProductSelection = () => {
     const allSelected = filteredProducts.every((product) => product.selected);
     const updatedFilteredProducts = filteredProducts.map((product) => ({
@@ -205,6 +215,22 @@ const SalesPage = () => {
     const selected = filteredProducts.filter((product) => product.selected);
     setSelectedProducts(selected);
     setShowSaleModal(true);
+  };
+
+  const addNewItem = (formData) => {
+    // const updatedTableData = [...tableData, formData];
+    // setTableData(updatedTableData);
+    toggleModal();
+    notificationComponentRef.current.showNotification(
+      // `A new item has added to ${modalItemType} successfully`,
+      "success"
+    );
+  };
+
+  const openEditModal = (item) => {
+    console.log(item, "Item");
+    setEditItemData(item);
+    setModalOpen(true);
   };
 
   const sellProducts = async (saleData) => {
@@ -314,13 +340,30 @@ const SalesPage = () => {
           <CardHeader>
             <Row>
               <Col className="text-left" sm="3">
-                <h5 className="card-category">Sales</h5>
+                <h5 className="card-category">Transactions</h5>
                 <CardTitle tag="h2">Products</CardTitle>
               </Col>
+              <Col sm="9">
+                <Button
+                  color="primary"
+                  onClick={() => toggleModal()}
+                  className="float-right"
+                >
+                  Add
+                </Button>
+              </Col>
               <Col sm="12" className="text-center">
-                <Button onClick={handlePreviousDay}>&lt;</Button>
-                <span className="mx-1">{selectedDate.toDateString()}</span>
-                <Button onClick={handleNextDay}>&gt;</Button>
+                <Col sm="6">
+                  <FormGroup>
+                    <Label for="startDate">Start Date</Label>
+                    <Input
+                      type="date"
+                      id="startDate"
+                      value={startDate}
+                      onChange={handleStartDateChange}
+                    />
+                  </FormGroup>
+                </Col>
               </Col>
             </Row>
           </CardHeader>
@@ -328,27 +371,33 @@ const SalesPage = () => {
             <Table className="tablesorter productsTable" responsive>
               <thead className="text-primary">
                 <tr>
-                  {salesTableHeaders.map((header, index) => (
+                  {transactionsTableHeaders.map((header, index) => (
                     <th key={index}>{header}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {sales.map((sale, index) => (
+                {tableData.map((sale, index) => (
                   <tr key={index}>
-                    {salesColumns.map((key, index) => (
+                    {transactionsColumns.map((key, index) => (
                       <td className={key} key={index}>
                         {sale[key]}
                       </td>
                     ))}
+                    <td align="right" key={index}>
+                      <Button color="link" onClick={() => openEditModal(sale)}>
+                        <i className="tim-icons icon-pencil" />
+                        <span className="d-lg-none d-md-block">Edit</span>
+                      </Button>
+                    </td>
                   </tr>
                 ))}
                 <tr>
-                  <td colSpan={salesColumns.length - 1}></td>
+                  <td colSpan={transactionsColumns.length - 1}></td>
                   {/* <td>Total Sale Price:</td> */}
                   <td className="text-success text-right">
                     {/* Calculate and display total sale price */}
-                    {sales
+                    {tableData
                       .reduce(
                         (total, sale) =>
                           Number(total) + Number(sale.sale_price || 0),
@@ -362,7 +411,20 @@ const SalesPage = () => {
           </CardBody>
         </Card>
 
-        {showSaleModal && (
+        <AddItemModal
+          modalOpen={modalOpen}
+          toggleModal={() => setModalOpen(!modalOpen)}
+          // itemType={modalItemType}
+          // notificationComponentRef={notificationComponentRef}
+          transactionsType={transactionsType}
+          addNewItem={addNewItem}
+          setTableData={setTableData}
+          tableData={tableData}
+          editItemData={editItemData}
+          setEditItemData={setEditItemData}
+        />
+
+        {/* {showSaleModal && (
           <SaleModal
             selectedProducts={selectedProducts}
             // banks={banks} // Pass banks data if available
@@ -370,10 +432,10 @@ const SalesPage = () => {
             sellProducts={sellProducts}
             setSales={setSales}
           />
-        )}
+        )} */}
       </div>
     </>
   );
 };
 
-export default SalesPage;
+export default Transactions;

@@ -157,6 +157,26 @@ export const api = createApi({
         },
       }),
     }),
+    transactionUpdate: builder.mutation({
+      query: (data) => ({
+        url: "/transactions",
+        method: "PUT",
+        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
+    addTransaction: builder.mutation({
+      query: (data) => ({
+        url: "/transactions",
+        method: "POST",
+        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
     fetchPanelData: builder.query({
       queryFn: (endpoint) => fetchPanelData(endpoint),
     }),
@@ -183,6 +203,8 @@ export const {
   useEditLocationDataMutation,
   useDeleteItemMutation,
   useTransferProductsMutation,
+  useTransactionUpdateMutation,
+  useAddTransactionMutation,
   useFetchPanelDataQuery,
 } = api;
 

@@ -36,7 +36,6 @@ function UserProfile() {
           <Col md="8">
             <Card>
               <CardHeader>
-                {userData.username}
                 <h5 className="title">Edit Profile </h5>
               </CardHeader>
               <CardBody>
@@ -44,9 +43,9 @@ function UserProfile() {
                   <Row>
                     <Col className="pr-md-1" md="5">
                       <FormGroup>
-                        <label>Company (disabled)</label>
+                        <label>Company</label>
                         <Input
-                          defaultValue="Black and White LLC."
+                          defaultValue={userData.name}
                           disabled
                           placeholder="Company"
                           type="text"
@@ -57,7 +56,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Username</label>
                         <Input
-                          defaultValue="Diar"
+                          defaultValue={userData.username}
                           placeholder="Username"
                           type="text"
                         />
@@ -68,10 +67,7 @@ function UserProfile() {
                         <label htmlFor="exampleInputEmail1">
                           Email address
                         </label>
-                        <Input
-                          placeholder="diarhajrizi@gmail.com"
-                          type="email"
-                        />
+                        <Input placeholder={userData.email} type="email" />
                       </FormGroup>
                     </Col>
                   </Row>
@@ -80,7 +76,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>First Name</label>
                         <Input
-                          defaultValue="Diar"
+                          defaultValue={userData.username}
                           placeholder="Company"
                           type="text"
                         />
@@ -90,7 +86,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Last Name</label>
                         <Input
-                          defaultValue="Hajrizi"
+                          defaultValue={userData.surname}
                           placeholder="Last Name"
                           type="text"
                         />

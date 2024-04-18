@@ -12,6 +12,7 @@ import ProductsList from "views/ProductsList";
 import SalesPage from "views/Sales";
 import AdministrationPanel from "views/AdministrationPanel";
 import LogIn from "views/LogIn";
+import Transactions from "views/Transactions";
 
 var routes = [
   {
@@ -78,7 +79,15 @@ var routes = [
     layout: "/admin",
     authentication: true,
   },
-
+  // {
+  //   path: "/transactions",
+  //   name: "Transactions",
+  //   rtlName: "قائمة الجدول",
+  //   icon: "tim-icons icon-puzzle-10",
+  //   component: <Transactions />,
+  //   layout: "/admin",
+  //   authentication: true,
+  // },
   {
     path: "/cms",
     name: "CMS Panels",
@@ -154,6 +163,7 @@ var routes = [
     component: <TableList />,
     layout: "/admin",
   },
+
   // {
   //   path: "/typography",
   //   name: "Typography",
