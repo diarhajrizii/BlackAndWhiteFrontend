@@ -45,8 +45,8 @@ function Notifications() {
       message: (
         <div>
           <div>
-            Welcome to <b>Black Dashboard React</b> - a beautiful freebie for
-            every web developer.
+            Welcome to <b>Black & White</b> - a beautiful freebie for every web
+            developer.
           </div>
         </div>
       ),

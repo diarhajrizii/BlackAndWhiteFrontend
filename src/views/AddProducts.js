@@ -1,145 +1,147 @@
-/* eslint-disable no-throw-literal */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Button,
   Card,
   CardHeader,
   CardBody,
   CardFooter,
-  FormGroup,
-  Form,
-  Input,
-  CardTitle,
   Row,
   Col,
+  Button,
+  CardTitle,
 } from "reactstrap";
-import NotificationAlert from "react-notification-alert";
-import Alert from "../components/Alert/alert";
 
-async function fetchPanelData(endpoint) {
-  try {
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+import ButtonGroupComponent from "components/Buttons/ButtonGroups";
+import ProductForm from "components/Forms/ProductForm";
+import NotificationComponent from "../components/Alert/alert";
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching panel data:", error);
-    return [];
-  }
-}
+import {
+  useFetchBrandsQuery,
+  useFetchColorsQuery,
+  useFetchNumbersQuery,
+  useFetchTypesQuery,
+  useAddProductMutation,
+} from "apiSlice"; // Adjust the path accordingly
+import AccessoriesForm from "components/Forms/AccessoriesForm";
 
 function AddProducts() {
-  const notificationAlertRef = React.useRef(null);
-  const [code, setCode] = useState("");
-  const [brand, setBrand] = useState(0);
-  const [type, setType] = useState(0);
-  const [color, setColor] = useState(0);
-  const [stockPrice, setStockPrice] = useState(0);
-  const [importPrice, setImportPrice] = useState(0);
-  const [sizes, setSizes] = useState({});
-  const [brandOptions, setBrandOptions] = useState([]);
-  const [colorOptions, setColorOptions] = useState([]);
-  const [typeOptions, setTypeOptions] = useState([]);
+  // Ref for the NotificationComponent
+  const notificationComponentRef = useRef();
+
+  // State variables
+  const [formData, setFormData] = useState({
+    code: "",
+    name: "",
+    brand: 0,
+    type: 0,
+    color: 0,
+    stockPrice: 0,
+    importPrice: 0,
+    sizes: {},
+    productType: "shoes",
+  });
+
+  const [activeButton, setActiveButton] = useState("shoes");
+
+  // RTK Query hooks
+  const { data: brandOptions } = useFetchBrandsQuery(activeButton);
+  const { data: colorOptions } = useFetchColorsQuery();
+  const { data: typeOptions } = useFetchTypesQuery(activeButton);
+  const { data: numberData } = useFetchNumbersQuery(activeButton);
 
   useEffect(() => {
-    async function fetchDataFromAPIs() {
-      try {
-        const [brandData, colorData, numberData, typeData] = await Promise.all([
-          fetchPanelData("/api/v1/panels/brands"),
-          fetchPanelData("/api/v1/panels/colors"),
-          fetchPanelData("/api/v1/panels/numbers"),
-          fetchPanelData("/api/v1/panels/types"),
-        ]);
-
-        setBrandOptions(brandData.data.data);
-        setColorOptions(colorData.data.data);
-        setTypeOptions(typeData.data.data);
-        setBrand(brandData.data.data[0]?.id || 0);
-        setType(colorData.data.data[0]?.id || 0);
-        setColor(typeData.data.data[0]?.id || 0);
-
-        const initialSizes = {};
-        numberData.data.data.forEach((number) => {
-          initialSizes[number.number] = 0;
-        });
-        setSizes(initialSizes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+    if (
+      (brandOptions?.data && colorOptions?.data && typeOptions?.data,
+      numberData?.data)
+    ) {
+      // Set default values for brand, color, and type
+      setFormData((prevData) => ({
+        ...prevData,
+        brand: brandOptions.data[0]?.id || 0, // Set the first brand option as default, or 0 if no options
+        type: typeOptions.data[0]?.id || 0, // Set the first type option as default, or 0 if no options
+        color: colorOptions.data[0]?.id || 0, // Set the first color option as default, or 0 if no options
+        sizes: Object.fromEntries(
+          numberData?.data.map((number) => [number.number, 0])
+        ),
+        productType: activeButton,
+      }));
     }
-    fetchDataFromAPIs();
-  }, []);
+  }, [brandOptions, colorOptions, typeOptions]);
 
-  const handleCodeChange = (e) => {
-    setCode(e.target.value);
+  // // Function to fetch data from APIs
+  const fetchDataFromAPIs = async (button) => {
+    try {
+      setActiveButton(button);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setActiveButton("shoes");
+    }
   };
 
-  const handleBrandChange = (e) => {
-    setBrand(e.target.value);
+  // Handle form input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === "code" || name === "name" ? value : parseInt(value, 10),
+    }));
   };
 
-  const handleTypeChange = (e) => {
-    setType(e.target.value);
-  };
-
-  const handleColorChange = (e) => {
-    setColor(e.target.value);
-  };
-
-  const handleStockPriceChange = (e) => {
-    setStockPrice(parseInt(e.target.value));
-  };
-
-  const handleImportPriceChange = (e) => {
-    setImportPrice(parseInt(e.target.value));
-  };
-
+  // Handle size quantity change
   const handleSizeQuantityChange = (e, size) => {
-    const newSize = { ...sizes, [size]: parseInt(e.target.value, 10) };
-    setSizes(newSize);
+    const newSize = { ...formData.sizes, [size]: parseInt(e.target.value, 10) };
+    setFormData((prevData) => ({
+      ...prevData,
+      sizes: newSize,
+    }));
   };
 
+  // RTK Query Mutation
+  // const addProductMutation = useAddProductMutation();
+
+  // Handle save button click
   const handleSave = async () => {
     try {
-      const sizesData = Object.entries(sizes).map(([size, quantity]) => ({
-        size: parseInt(size, 10),
-        quantity: parseInt(quantity, 10),
-      }));
+      // Validate required fields
+      let requiredFields = [
+        "code",
+        "brand",
+        "type",
+        "color",
+        "stockPrice",
+        "importPrice",
+      ];
 
-      const data = {
-        code,
-        brand,
-        type,
-        color,
-        stockPrice,
-        importPrice,
-        sizes: sizesData,
-      };
+      if (activeButton === "accessories") {
+        requiredFields = [
+          "code",
+          "brand",
+          "name",
+          "stockPrice",
+          "importPrice",
+          "quantity",
+        ];
+      }
 
-      const requiredFields = {
-        code,
-        brand,
-        type,
-        color,
-        stockPrice,
-        importPrice,
-      };
-      for (const key in requiredFields) {
-        if (!requiredFields[key]) {
+      requiredFields.forEach((key) => {
+        if (!formData[key]) {
           throw new Error(
             `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`
           );
         }
-      }
+      });
 
+      // Prepare sizes data
+      const sizesData = Object.entries(formData.sizes).map(
+        ([size, quantity]) => ({
+          size: size,
+          quantity: parseInt(quantity, 10),
+        })
+      );
+
+      // Prepare data to be sent to the API
+      const data = { ...formData, sizes: sizesData };
+
+      // Send POST request to the API
       const response = await fetch("/api/v1/products/products", {
         method: "POST",
         headers: {
@@ -147,144 +149,95 @@ function AddProducts() {
         },
         body: JSON.stringify(data),
       });
+
+      // Parse the response data
       const returnData = await response.json();
 
+      // Check for success in the response
       if (!returnData.success) {
         throw new Error(returnData.message);
       }
 
-      setCode("");
-      setBrand(brandOptions[0]);
-      setColor(colorOptions[0]);
-      setImportPrice(0);
-      setStockPrice(0);
-      setType(0);
+      // Reset form data and show success notification
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        importPrice: 0,
+        stockPrice: 0,
+        name: "",
+      }));
 
-      const options = Alert(200, "Product was added successfully");
-      notificationAlertRef.current.notificationAlert(options);
+      notificationComponentRef.current.showNotification(
+        "Product added successfully",
+        "success"
+      );
     } catch (error) {
+      // Handle errors and show error notification
       const errorMessage = error.message || "Error adding product";
       console.error(errorMessage);
-      const options = Alert(400, errorMessage);
-      notificationAlertRef.current.notificationAlert(options);
+      notificationComponentRef.current.showNotification(errorMessage, "danger");
     }
   };
 
+  const numberObject = numberData
+    ? Object.fromEntries(numberData?.data.map((number) => [number.number, 0]))
+    : null;
+
+  const isDataLoaded =
+    brandOptions && colorOptions && typeOptions && numberObject;
+
   return (
     <div className="content">
-      <div className="react-notification-alert-container">
-        <NotificationAlert ref={notificationAlertRef} />
-      </div>
+      {/* NotificationComponent for displaying alerts */}
+      <NotificationComponent ref={notificationComponentRef} />
+
+      {/* Product entry form */}
       <Row>
         <Col md="12">
           <Card>
             <CardHeader>
-              <h5 className="card-category">Add Product</h5>
-              <CardTitle tag="h2">Products</CardTitle>
+              <Row>
+                <Col className="text-left" sm="6">
+                  <h5 className="card-category">Add Product</h5>
+                  <CardTitle tag="h2">Products</CardTitle>
+                </Col>
+                <Col sm="6">
+                  {/* ButtonGroupComponent for switching product types */}
+                  <ButtonGroupComponent
+                    activeButton={activeButton}
+                    onButtonClick={fetchDataFromAPIs}
+                    buttons={["shoes", "textile", "accessories"]}
+                  />
+                </Col>
+              </Row>
             </CardHeader>
             <CardBody>
-              <Form>
-                <Row>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Code</label>
-                      <Input
-                        type="text"
-                        value={code}
-                        onChange={handleCodeChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Brand</label>
-                      <Input
-                        type="select"
-                        value={brand}
-                        onChange={handleBrandChange}
-                      >
-                        {brandOptions.map((brand) => (
-                          <option key={brand.id} value={brand.id}>
-                            {brand.brandName}
-                          </option>
-                        ))}
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Type</label>
-                      <Input
-                        type="select"
-                        value={type}
-                        onChange={handleTypeChange}
-                      >
-                        {typeOptions.map((type) => (
-                          <option key={type.id} value={type.id}>
-                            {type.type}
-                          </option>
-                        ))}
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Color</label>
-                      <Input
-                        type="select"
-                        value={color}
-                        onChange={handleColorChange}
-                      >
-                        {colorOptions.map((color) => (
-                          <option key={color.id} value={color.id}>
-                            {color.colorName}
-                          </option>
-                        ))}
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Import Price</label>
-                      <Input
-                        type="number"
-                        value={importPrice}
-                        onChange={handleImportPriceChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md="6">
-                    <FormGroup>
-                      <label>Stock Price</label>
-                      <Input
-                        type="number"
-                        value={stockPrice}
-                        onChange={handleStockPriceChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  {Object.keys(sizes).map((size) => (
-                    <Col md="2" key={size}>
-                      <FormGroup>
-                        <label>Size {size}</label>
-                        <Input
-                          type="number"
-                          value={sizes[size]}
-                          onChange={(e) => handleSizeQuantityChange(e, size)}
-                        />
-                      </FormGroup>
-                    </Col>
-                  ))}
-                </Row>
-              </Form>
+              {isDataLoaded &&
+                activeButton &&
+                activeButton !== "accessories" && (
+                  <ProductForm
+                    formData={formData}
+                    brandOptions={brandOptions?.data}
+                    colorOptions={colorOptions?.data}
+                    typeOptions={typeOptions?.data}
+                    handleChange={handleChange}
+                    numberOptions={numberObject}
+                    handleSizeQuantityChange={handleSizeQuantityChange}
+                    productType={activeButton}
+                  />
+                )}
+              {isDataLoaded &&
+                activeButton &&
+                activeButton === "accessories" && (
+                  <AccessoriesForm
+                    formData={formData}
+                    brandOptions={brandOptions?.data}
+                    handleChange={handleChange}
+                  />
+                )}
             </CardBody>
             <CardFooter style={{ textAlign: "right" }}>
+              {/* Save button to submit the form */}
               <Button className="btn-fill" color="primary" onClick={handleSave}>
                 Save
               </Button>

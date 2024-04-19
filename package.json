@@ -1,26 +1,32 @@
 {
-  "name": "black-dashboard-react",
+  "name": "black-and-white",
   "version": "1.2.2",
   "private": true,
   "proxy": "http://localhost:5000",
-  "homepage": "https://demos.creative-tim.com/black-dashboard-react/#/admin/dashboard",
+  "homepage": "/",
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@fortawesome/fontawesome-free": "6.4.0",
-    "@mui/icons-material": "^5.14.19",
+    "@mui/icons-material": "^5.15.0",
+    "@mui/material": "^5.15.0",
+    "@reduxjs/toolkit": "^2.2.2",
     "axios": "^1.6.2",
     "bootstrap": "4.6.2",
     "chart.js": "3.9.1",
     "classnames": "2.3.2",
     "perfect-scrollbar": "1.5.5",
     "prop-types": "15.8.1",
-    "react": ">=16.8.0",
+    "react": "^18.2.0",
     "react-barcode": "^1.4.6",
     "react-chartjs-2": "3.3.0",
-    "react-dom": ">=16.8.0",
+    "react-dom": "^18.2.0",
     "react-notification-alert": "0.0.13",
+    "react-redux": "^9.1.0",
     "react-router-dom": "6.11.1",
     "react-scripts": "5.0.1",
-    "sass": "1.62.1"
+    "sass": "1.62.1",
+    "use-scan-detection-react18": "^0.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -28,15 +34,11 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
-    "compile-scss": "sass src/assets/scss/black-dashboard-react.scss src/assets/css/black-dashboard-react.css",
-    "minify-scss": "sass src/assets/scss/black-dashboard-react.scss src/assets/css/black-dashboard-react.min.css --style compressed"
+    "compile-scss": "sass src/assets/scss/black-and-white.scss src/assets/css/black-and-white.css",
+    "minify-scss": "sass src/assets/scss/black-and-white.scss src/assets/css/black-and-white.min.css --style compressed"
   },
   "eslintConfig": {
     "extends": "react-app"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
   },
   "browserslist": [
     ">0.2%",

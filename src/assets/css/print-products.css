@@ -1,3 +1,6 @@
+.sale_price {
+  text-align: right !important;
+}
 @media print {
   .page {
     width: 210mm; /* A4 width */
@@ -20,6 +23,7 @@
     margin-top: 8px;
     margin-bottom: 8px;
   }
+
   .numberColumn {
     display: flex;
     justify-content: center;
@@ -76,6 +80,6 @@
   .barcode-container rect {
   }
 }
-.productsTable .price {
+/* .productsTable .price {
   text-align: end;
-}
+} */

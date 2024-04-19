@@ -1,0 +1,22 @@
+.login-container {
+  padding-top: 100px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+.login-container .card {
+  width: 550px !important;
+  padding: 20px;
+  height: auto;
+}
+.login-container .imageContainer {
+  text-align: center;
+}
+
+@media only screen and (max-width: 600px) {
+  .login-container {
+    padding-top: 0px !important;
+  }
+  .login-container .card {
+    height: 100vh;
+  }
+}

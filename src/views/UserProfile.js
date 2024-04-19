@@ -1,21 +1,5 @@
-/*!
-
-=========================================================
-* Black Dashboard React v1.2.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/black-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import React from "react";
+import { useFetchUserDataQuery } from "apiSlice";
+import React, { useEffect, useState } from "react";
 
 // reactstrap components
 import {
@@ -33,6 +17,18 @@ import {
 } from "reactstrap";
 
 function UserProfile() {
+  const [userData, setUserData] = useState({});
+  const { data: userDataResponse, error, isLoading } = useFetchUserDataQuery(); // Fetch user data using the generated hook
+
+  useEffect(() => {
+    if (userDataResponse) {
+      setUserData(userDataResponse.data);
+    }
+  }, [userDataResponse]);
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>Error: {error.message}</div>;
   return (
     <>
       <div className="content">
@@ -40,16 +36,16 @@ function UserProfile() {
           <Col md="8">
             <Card>
               <CardHeader>
-                <h5 className="title">Edit Profile</h5>
+                <h5 className="title">Edit Profile </h5>
               </CardHeader>
               <CardBody>
                 <Form>
                   <Row>
                     <Col className="pr-md-1" md="5">
                       <FormGroup>
-                        <label>Company (disabled)</label>
+                        <label>Company</label>
                         <Input
-                          defaultValue="Creative Code Inc."
+                          defaultValue={userData.name}
                           disabled
                           placeholder="Company"
                           type="text"
@@ -60,7 +56,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Username</label>
                         <Input
-                          defaultValue="michael23"
+                          defaultValue={userData.username}
                           placeholder="Username"
                           type="text"
                         />
@@ -71,7 +67,7 @@ function UserProfile() {
                         <label htmlFor="exampleInputEmail1">
                           Email address
                         </label>
-                        <Input placeholder="mike@email.com" type="email" />
+                        <Input placeholder={userData.email} type="email" />
                       </FormGroup>
                     </Col>
                   </Row>
@@ -80,7 +76,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>First Name</label>
                         <Input
-                          defaultValue="Mike"
+                          defaultValue={userData.username}
                           placeholder="Company"
                           type="text"
                         />
@@ -90,7 +86,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Last Name</label>
                         <Input
-                          defaultValue="Andrew"
+                          defaultValue={userData.surname}
                           placeholder="Last Name"
                           type="text"
                         />
@@ -102,7 +98,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Address</label>
                         <Input
-                          defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                          defaultValue="Rr.Uleza, nr. 144"
                           placeholder="Home Address"
                           type="text"
                         />
@@ -114,7 +110,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>City</label>
                         <Input
-                          defaultValue="Mike"
+                          defaultValue="Prishtine"
                           placeholder="City"
                           type="text"
                         />
@@ -124,7 +120,7 @@ function UserProfile() {
                       <FormGroup>
                         <label>Country</label>
                         <Input
-                          defaultValue="Andrew"
+                          defaultValue="Kosova"
                           placeholder="Country"
                           type="text"
                         />
@@ -143,8 +139,7 @@ function UserProfile() {
                         <label>About Me</label>
                         <Input
                           cols="80"
-                          defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                            that two seat Lambo."
+                          defaultValue=""
                           placeholder="Here can be your description"
                           rows="4"
                           type="textarea"

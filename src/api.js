@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 // api.js
 
 const saveColorData = async (colorData) => {
@@ -54,7 +55,7 @@ const saveNumberData = async (numberData) => {
   }
 };
 
-const saveTypeData = async (typeData) => {
+const saveSpecificTypeData = async (typeData) => {
   try {
     const response = await fetch("/api/v1/panels/type", {
       method: "POST",
@@ -69,6 +70,43 @@ const saveTypeData = async (typeData) => {
   } catch (error) {
     console.error("Error saving type data:", error);
     // Handle errors
+  }
+};
+const saveLocationsData = async (locationData) => {
+  try {
+    const response = await fetch("/api/v1/panels/location", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(locationData),
+    });
+    const responseData = await response.json();
+    // Handle response data if needed
+    return responseData; // Return response data if needed
+  } catch (error) {
+    console.error("Error saving type data:", error);
+    // Handle errors
+  }
+};
+
+const fetchPanelData = async (endpoint) => {
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching panel data:", error);
+    return [];
   }
 };
 
@@ -107,6 +145,26 @@ const deleteItem = async (endpoint, data) => {
   }
 };
 
+const transferProducts = async (ids, location) => {
+  try {
+    const response = await fetch(`/api/v1/products/transfer`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids, location }),
+    });
+    const responseData = await response.json();
+    if (!responseData.success)
+      throw { message: "Error while transferring products" };
+    // Handle response data if needed
+    return responseData; // Return response data if needed
+  } catch (error) {
+    console.error(`Error saving data:`, error);
+    return { success: false, message: error.message };
+  }
+};
+
 // Example usage:
 const editColorData = async (colorData) => {
   return await saveData("color", colorData);
@@ -123,11 +181,14 @@ const editNumberData = async (numberData) => {
 const editTypeData = async (typeData) => {
   return await saveData("type", typeData);
 };
+const editLocationData = async (locationData) => {
+  return await saveData("location", locationData);
+};
 
 export {
   saveColorData,
   saveBrandData,
-  saveTypeData,
+  saveSpecificTypeData,
   saveNumberData,
   saveData,
   editColorData,
@@ -135,4 +196,8 @@ export {
   editNumberData,
   editTypeData,
   deleteItem,
+  saveLocationsData,
+  editLocationData,
+  transferProducts,
+  fetchPanelData,
 };

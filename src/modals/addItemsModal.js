@@ -13,16 +13,17 @@ import {
 } from "reactstrap";
 import "./modal.css";
 import {
-  saveColorData,
-  saveBrandData,
-  saveTypeData,
-  saveNumberData,
-  editBrandData,
-  editColorData,
-  editNumberData,
-  editTypeData,
-} from "../api.js"; // Import API functions
-import Alert from "../components/Alert/alert";
+  useSaveColorDataMutation,
+  useSaveBrandDataMutation,
+  useSaveNumberDataMutation,
+  useSaveSpecificTypeDataMutation,
+  useSaveLocationsDataMutation,
+  useEditColorDataMutation,
+  useEditBrandDataMutation,
+  useEditNumberDataMutation,
+  useEditTypeDataMutation,
+  useEditLocationDataMutation,
+} from "apiSlice";
 
 const AddItemModal = ({
   modalOpen,
@@ -32,10 +33,21 @@ const AddItemModal = ({
   setTableData,
   editItemData,
   setEditItemData,
-  notificationAlertRef,
+  notificationComponentRef,
   tableData,
-  // updateModalData, // Receive the function to update modal data
 }) => {
+  const [saveColorData] = useSaveColorDataMutation();
+  const [saveBrandData] = useSaveBrandDataMutation();
+  const [saveNumberData] = useSaveNumberDataMutation();
+  const [saveLocationsData] = useSaveLocationsDataMutation();
+  const [editBrandData] = useEditBrandDataMutation();
+  const [editTypeData] = useEditTypeDataMutation();
+  const [editColorData] = useEditColorDataMutation();
+  const [editNumberData] = useEditNumberDataMutation();
+  const [editLocationData] = useEditLocationDataMutation();
+  const [saveSpecificTypeData] = useSaveSpecificTypeDataMutation();
+  const [loading, setLoading] = useState(false);
+
   let modalTitle = "";
   const [formData, setFormData] = useState({});
 
@@ -55,6 +67,9 @@ const AddItemModal = ({
       break;
     case "types":
       modalTitle = "Add New Type";
+      break;
+    case "locations":
+      modalTitle = "Add New Location";
       break;
     default:
       modalTitle = "";
@@ -83,16 +98,16 @@ const AddItemModal = ({
 
     setTableData(updatedItems);
     toggleModal();
-    const options = Alert(
-      200,
-      `Item of ${itemType} with ID:${formData.id} has updated successfully`
+    notificationComponentRef.current.showNotification(
+      `Item of ${itemType} with ID:${formData.id} has updated successfully`,
+      "success"
     );
-    notificationAlertRef.current.notificationAlert(options);
   };
 
   const handleSubmit = async () => {
     try {
       let data;
+      setLoading(true);
       if (!editItemData.id) {
         switch (itemType) {
           case "brands":
@@ -105,12 +120,16 @@ const AddItemModal = ({
             data = await saveNumberData(formData);
             break;
           case "types":
-            data = await saveTypeData(formData);
+            data = await saveSpecificTypeData(formData);
+            break;
+          case "locations":
+            data = await saveLocationsData(formData);
             break;
           default:
             break;
         }
-        const newObj = { id: data.data, ...formData };
+
+        const newObj = { id: data.data.data, ...formData };
         addNewItem(newObj);
       } else {
         switch (itemType) {
@@ -126,13 +145,19 @@ const AddItemModal = ({
           case "types":
             data = await editTypeData(formData);
             break;
+          case "locations":
+            data = await editLocationData(formData);
+            break;
           default:
             break;
         }
         updateItemProperty(formData, tableData);
       }
+      setLoading(false);
     } catch (error) {
+      console.log(error);
       console.error("Error saving data:", error);
+      setLoading(false);
     }
   };
 
@@ -144,6 +169,18 @@ const AddItemModal = ({
           {itemType === "brands" && (
             <>
               <FormGroup>
+                <Label for="type">Type</Label>
+                <Input
+                  type="select"
+                  name="type"
+                  id="type"
+                  value={editItemData.type}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                  <option value="accessories">Accessories</option>
+                </Input>
                 <Label for="brandName">Brand Name</Label>
                 <Input
                   type="text"
@@ -210,6 +247,17 @@ const AddItemModal = ({
           {itemType === "numbers" && (
             <>
               <FormGroup>
+                <Label for="type">Type</Label>
+                <Input
+                  type="select"
+                  name="type"
+                  id="type"
+                  value={editItemData.type || "shoes"}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                </Input>
                 <Label for="number">Number</Label>
                 <Input
                   type="text"
@@ -227,11 +275,37 @@ const AddItemModal = ({
               <FormGroup>
                 <Label for="type">Type</Label>
                 <Input
-                  type="text"
+                  type="select"
                   name="type"
                   id="type"
-                  value={editItemData.type || ""}
+                  value={editItemData.type || "shoes"}
+                  onChange={handleInputChange}
+                >
+                  <option value="shoes">Shoes</option>
+                  <option value="textile">Textile</option>
+                </Input>
+                <Label for="specificType">Specific Type</Label>
+                <Input
+                  type="text"
+                  name="specificType"
+                  id="specificType"
+                  value={editItemData.specificType || ""}
                   placeholder="Enter Type"
+                  onChange={handleInputChange}
+                />
+              </FormGroup>
+            </>
+          )}
+          {itemType === "locations" && (
+            <>
+              <FormGroup>
+                <Label for="name">Name</Label>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={editItemData.name || ""}
+                  placeholder="Enter Name"
                   onChange={handleInputChange}
                 />
               </FormGroup>
@@ -240,8 +314,8 @@ const AddItemModal = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={handleSubmit}>
-          Save
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
+          {loading ? "Saving..." : "Save"}
         </Button>
         <Button color="secondary" onClick={toggleModal}>
           Cancel

@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
-import classNames from "classnames";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
-  ButtonGroup,
   Card,
   CardHeader,
   CardBody,
@@ -11,13 +9,13 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import AddItemModal from "../modals/modal.js";
+import AddItemModal from "../modals/addItemsModal.js";
 import DeleteItemModal from "../modals/deleteModal.js";
-import NotificationAlert from "react-notification-alert";
-import Alert from "../components/Alert/alert.js";
+import ButtonGroupComponent from "components/Buttons/ButtonGroups.js";
+import NotificationComponent from "../components/Alert/alert.js";
 
 function CMSPanel() {
-  const notificationAlertRef = React.useRef(null);
+  const notificationComponentRef = useRef(new NotificationComponent());
   const [tableData, setTableData] = useState([]);
   const [activeButton, setActiveButton] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +27,7 @@ function CMSPanel() {
     try {
       const response = await fetch(`/api/v1/panels/${button}`);
       const responseData = await response.json();
-      setTableData(responseData.success ? responseData.data.data : []);
+      setTableData(responseData.success ? responseData.data : []);
       setActiveButton(button);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -58,11 +56,10 @@ function CMSPanel() {
     const updatedTableData = [...tableData, formData];
     setTableData(updatedTableData);
     toggleModal();
-    const options = Alert(
-      200,
-      `A new item has added to ${modalItemType} successfully`
+    notificationComponentRef.current.showNotification(
+      `A new item has added to ${modalItemType} successfully`,
+      "success"
     );
-    notificationAlertRef.current.notificationAlert(options);
   };
 
   const renderTableHeaders = () => {
@@ -70,11 +67,13 @@ function CMSPanel() {
       case "colors":
         return ["ID", "Color Name", "Albanian", "English", "Turkish", ""];
       case "brands":
-        return ["ID", "Brand Name", "Produced", ""];
+        return ["ID", "Brand Name", "Produced", "Type", ""];
       case "numbers":
-        return ["ID", "Number", ""];
+        return ["ID", "Number", "Type", ""];
       case "types":
-        return ["ID", "Type", ""];
+        return ["ID", "Specific Type", "Type", ""];
+      case "Locations":
+        return ["ID", "Locations", ""];
       default:
         return [];
     }
@@ -95,7 +94,7 @@ function CMSPanel() {
   return (
     <div className="content">
       <div className="react-notification-alert-container">
-        <NotificationAlert ref={notificationAlertRef} />
+        <NotificationComponent ref={notificationComponentRef} />
       </div>
       <Card className="card-chart">
         <CardHeader>
@@ -105,25 +104,11 @@ function CMSPanel() {
               <CardTitle tag="h2">CMS Panel</CardTitle>
             </Col>
             <Col sm="6">
-              <ButtonGroup
-                className="btn-group-toggle float-right"
-                data-toggle="buttons"
-              >
-                {["brands", "colors", "numbers", "types"].map((button) => (
-                  <Button
-                    key={button}
-                    tag="label"
-                    color="info"
-                    size="sm"
-                    className={classNames("btn-simple", {
-                      active: activeButton === button,
-                    })}
-                    onClick={() => handleButtonClick(button)}
-                  >
-                    {button.charAt(0).toUpperCase() + button.slice(1)}
-                  </Button>
-                ))}
-              </ButtonGroup>
+              <ButtonGroupComponent
+                activeButton={activeButton}
+                onButtonClick={handleButtonClick}
+                buttons={["brands", "colors", "numbers", "types", "locations"]}
+              />
             </Col>
             <Col sm="12">
               <Button
@@ -171,7 +156,7 @@ function CMSPanel() {
         modalOpen={modalOpen}
         toggleModal={() => setModalOpen(!modalOpen)}
         itemType={modalItemType}
-        notificationAlertRef={notificationAlertRef}
+        notificationComponentRef={notificationComponentRef}
         addNewItem={addNewItem}
         setTableData={setTableData}
         tableData={tableData}
@@ -180,7 +165,7 @@ function CMSPanel() {
       />
       <DeleteItemModal
         modalOpen={deleteModalOpen}
-        notificationAlertRef={notificationAlertRef}
+        notificationComponentRef={notificationComponentRef}
         toggleModal={() => setDeleteModalOpen(!deleteModalOpen)}
         itemType={modalItemType}
         setTableData={setTableData}
