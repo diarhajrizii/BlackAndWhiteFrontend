@@ -43,7 +43,6 @@ const LogIn = () => {
       `Register Form isn't available right now`,
       "danger"
     );
-    return false;
     setShowRegisterForm(!showRegisterForm);
     setEmail("");
     setPassword("");

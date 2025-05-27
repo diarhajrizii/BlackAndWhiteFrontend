@@ -274,7 +274,7 @@ const Transactions = () => {
       <div className="content">
         <BarcodeScanner onBarcodeScanned={handleBarcodeScanned} />
         <NotificationComponent ref={notificationComponentRef} />
-        <Card>
+        {/* <Card>
           <CardHeader>
             <Row>
               <Col className="text-left" sm="6">
@@ -335,7 +335,7 @@ const Transactions = () => {
               </tbody>
             </Table>
           </CardBody>
-        </Card>
+        </Card> */}
         <Card>
           <CardHeader>
             <Row>
