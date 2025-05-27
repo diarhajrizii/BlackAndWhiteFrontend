@@ -176,10 +176,10 @@ const SalesPage = () => {
     const filtered = products.filter((product) => {
       const codeCondition =
         !codeFilter ||
-        product.code.toLowerCase().includes(codeFilter.toLowerCase());
+        product.code?.toLowerCase().includes(codeFilter.toLowerCase());
       const brandCondition =
         !brandFilter ||
-        product.brand.toLowerCase().includes(brandFilter.toLowerCase());
+        product.brand?.toLowerCase().includes(brandFilter.toLowerCase());
       if (scannedCode) {
         const barcodeCondition = scannedCode === product.barcode;
         return barcodeCondition;

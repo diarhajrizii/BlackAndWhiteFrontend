@@ -49,7 +49,9 @@ const AddItemModal = ({
   const [loading, setLoading] = useState(false);
 
   let modalTitle = "";
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    type: "shoes",
+  });
 
   useEffect(() => {
     setFormData(editItemData); // Update formData when editItemData changes
@@ -104,10 +106,53 @@ const AddItemModal = ({
     );
   };
 
+  async function checkDataExists(itemType, formData) {
+    let requiredFields;
+    switch (itemType) {
+      case "brands":
+        requiredFields = ["type", "brandName", "produced"];
+        break;
+      case "colors":
+        requiredFields = [
+          "colorName",
+          "albanianName",
+          "englishName",
+          "turkishName",
+        ];
+        break;
+      case "numbers":
+        requiredFields = ["type", "number"];
+        break;
+      case "types":
+        requiredFields = ["type", "specificType"];
+        break;
+      case "locations":
+        requiredFields = ["name"];
+        break;
+      default:
+        return false;
+    }
+
+    requiredFields.forEach((key) => {
+      if (!formData[key]?.trim()) {
+        notificationComponentRef.current.showNotification(
+          `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`,
+          "danger"
+        );
+        throw new Error(
+          `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`
+        );
+      }
+    });
+    return true;
+  }
+
   const handleSubmit = async () => {
     try {
       let data;
       setLoading(true);
+      await checkDataExists(itemType, formData);
+
       if (!editItemData.id) {
         switch (itemType) {
           case "brands":
