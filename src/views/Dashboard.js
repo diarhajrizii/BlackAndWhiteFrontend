@@ -38,9 +38,10 @@ function Dashboard(props) {
   const [bankPaymentChartData, setBankPaymentChartData] = useState(null);
 
   const [activeButton, setActiveButton] = useState("sales");
-
+  const today = new Date();
+  const year = today.getFullYear();
   const handleButtonClick = (button) => {
-    fetchShipmentsChartData({ type: button, years: [2024] });
+    fetchShipmentsChartData({ type: button, years: [year] });
     setActiveButton(button);
   };
 
@@ -104,10 +105,10 @@ function Dashboard(props) {
   };
 
   useEffect(() => {
-    fetchShipmentsChartData({ type: "Default", years: [2024] });
-    fetchQuantityChartData({ type: "quantity", year: [2024] });
-    fetchOnlineShipmentsChartData({ type: "onlinePrices", year: [2024] });
-    fetchBankPaymentChartData({ type: "bankPrices", year: [2024] });
+    fetchShipmentsChartData({ type: "Default", years: [year] });
+    fetchQuantityChartData({ type: "quantity", year: [year] });
+    fetchOnlineShipmentsChartData({ type: "onlinePrices", year: [year] });
+    fetchBankPaymentChartData({ type: "bankPrices", year: [year] });
   }, []);
 
   const onYearsChange = (onYearsChange) => {

@@ -8,8 +8,9 @@ import {
   Col,
   Button,
   CardTitle,
+  Alert,
 } from "reactstrap";
-
+import { Link } from "react-router-dom";
 import ButtonGroupComponent from "components/Buttons/ButtonGroups";
 import ProductForm from "components/Forms/ProductForm";
 import NotificationComponent from "../components/Alert/alert";
@@ -19,15 +20,12 @@ import {
   useFetchColorsQuery,
   useFetchNumbersQuery,
   useFetchTypesQuery,
-  useAddProductMutation,
-} from "apiSlice"; // Adjust the path accordingly
+} from "apiSlice";
 import AccessoriesForm from "components/Forms/AccessoriesForm";
 
 function AddProducts() {
-  // Ref for the NotificationComponent
   const notificationComponentRef = useRef();
 
-  // State variables
   const [formData, setFormData] = useState({
     code: "",
     name: "",
@@ -38,9 +36,15 @@ function AddProducts() {
     importPrice: 0,
     sizes: {},
     productType: "shoes",
+    quantity: 0,
   });
 
   const [activeButton, setActiveButton] = useState("shoes");
+  const [missingData, setMissingData] = useState({
+    brands: false,
+    colors: false,
+    types: false,
+  });
 
   // RTK Query hooks
   const { data: brandOptions } = useFetchBrandsQuery(activeButton);
@@ -48,26 +52,44 @@ function AddProducts() {
   const { data: typeOptions } = useFetchTypesQuery(activeButton);
   const { data: numberData } = useFetchNumbersQuery(activeButton);
 
+  // Set default values when data loads
   useEffect(() => {
+    const hasBrands = brandOptions?.data?.length > 0;
+    const hasColors = colorOptions?.data?.length > 0;
+    const hasTypes =
+      activeButton === "accessories" ? true : typeOptions?.data?.length > 0;
+
+    setMissingData({
+      brands: !hasBrands,
+      colors: activeButton === "accessories" ? false : !hasColors,
+      types: activeButton === "accessories" ? false : !hasTypes,
+    });
+
     if (
-      (brandOptions?.data && colorOptions?.data && typeOptions?.data,
-      numberData?.data)
+      hasBrands &&
+      (activeButton === "accessories" || (hasColors && hasTypes)) &&
+      numberData?.data
     ) {
-      // Set default values for brand, color, and type
       setFormData((prevData) => ({
         ...prevData,
-        brand: brandOptions.data[0]?.id || 0, // Set the first brand option as default, or 0 if no options
-        type: typeOptions.data[0]?.id || 0, // Set the first type option as default, or 0 if no options
-        color: colorOptions.data[0]?.id || 0, // Set the first color option as default, or 0 if no options
+        brand: brandOptions.data[0]?.id || 0,
+        type: activeButton === "accessories" ? 0 : typeOptions.data[0]?.id || 0,
+        color:
+          activeButton === "accessories" ? 0 : colorOptions.data[0]?.id || 0,
         sizes: Object.fromEntries(
-          numberData?.data.map((number) => [number.number, 0])
+          numberData.data.map((number) => [number.number, 0])
         ),
         productType: activeButton,
       }));
     }
-  }, [brandOptions, colorOptions, typeOptions]);
+  }, [
+    brandOptions?.data,
+    colorOptions?.data,
+    typeOptions?.data,
+    numberData?.data,
+    activeButton,
+  ]);
 
-  // // Function to fetch data from APIs
   const fetchDataFromAPIs = async (button) => {
     try {
       setActiveButton(button);
@@ -77,7 +99,6 @@ function AddProducts() {
     }
   };
 
-  // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -86,7 +107,6 @@ function AddProducts() {
     }));
   };
 
-  // Handle size quantity change
   const handleSizeQuantityChange = (e, size) => {
     const newSize = { ...formData.sizes, [size]: parseInt(e.target.value, 10) };
     setFormData((prevData) => ({
@@ -95,13 +115,8 @@ function AddProducts() {
     }));
   };
 
-  // RTK Query Mutation
-  // const addProductMutation = useAddProductMutation();
-
-  // Handle save button click
   const handleSave = async () => {
     try {
-      // Validate required fields
       let requiredFields = [
         "code",
         "brand",
@@ -122,8 +137,9 @@ function AddProducts() {
         ];
       }
 
+      // Validate required fields
       requiredFields.forEach((key) => {
-        if (!formData[key]) {
+        if (!formData[key] && formData[key] === 0) {
           throw new Error(
             `${key.charAt(0).toUpperCase() + key.slice(1)} is required!`
           );
@@ -150,48 +166,49 @@ function AddProducts() {
         body: JSON.stringify(data),
       });
 
-      // Parse the response data
       const returnData = await response.json();
 
-      // Check for success in the response
       if (!returnData.success) {
         throw new Error(returnData.message);
       }
 
-      // Reset form data and show success notification
-      setFormData((prevData) => ({
-        ...prevData,
+      // Reset form data
+      setFormData({
         code: "",
-        importPrice: 0,
-        stockPrice: 0,
         name: "",
-      }));
+        brand: brandOptions?.data[0]?.id || 0,
+        type: typeOptions?.data[0]?.id || 0,
+        color: colorOptions?.data[0]?.id || 0,
+        stockPrice: 0,
+        importPrice: 0,
+        sizes: Object.fromEntries(
+          numberData?.data?.map((number) => [number.number, 0]) || {}
+        ),
+        productType: activeButton,
+        quantity: 0,
+      });
 
       notificationComponentRef.current.showNotification(
         "Product added successfully",
         "success"
       );
     } catch (error) {
-      // Handle errors and show error notification
       const errorMessage = error.message || "Error adding product";
       console.error(errorMessage);
       notificationComponentRef.current.showNotification(errorMessage, "danger");
     }
   };
 
-  const numberObject = numberData
-    ? Object.fromEntries(numberData?.data.map((number) => [number.number, 0]))
-    : null;
-
   const isDataLoaded =
-    brandOptions && colorOptions && typeOptions && numberObject;
+    brandOptions &&
+    colorOptions &&
+    (activeButton === "accessories" || typeOptions) &&
+    numberData;
 
   return (
     <div className="content">
-      {/* NotificationComponent for displaying alerts */}
       <NotificationComponent ref={notificationComponentRef} />
 
-      {/* Product entry form */}
       <Row>
         <Col md="12">
           <Card>
@@ -202,7 +219,6 @@ function AddProducts() {
                   <CardTitle tag="h2">Products</CardTitle>
                 </Col>
                 <Col sm="6">
-                  {/* ButtonGroupComponent for switching product types */}
                   <ButtonGroupComponent
                     activeButton={activeButton}
                     onButtonClick={fetchDataFromAPIs}
@@ -212,33 +228,71 @@ function AddProducts() {
               </Row>
             </CardHeader>
             <CardBody>
+              {/* Missing data alerts */}
+              {missingData.brands && (
+                <Alert color="danger">
+                  No brands found. Please{" "}
+                  <Link to="/admin/cms">add brands in the CMS Panel</Link>.
+                </Alert>
+              )}
+              {missingData.colors && activeButton !== "accessories" && (
+                <Alert color="danger">
+                  No colors found. Please{" "}
+                  <Link to="/admin/cms">add colors in the CMS Panel</Link>.
+                </Alert>
+              )}
+              {missingData.types && activeButton !== "accessories" && (
+                <Alert color="danger">
+                  No types found. Please{" "}
+                  <Link to="/admin/cms">
+                    Add product types in the CMS Panel
+                  </Link>
+                  .
+                </Alert>
+              )}
+
               {isDataLoaded &&
                 activeButton &&
                 activeButton !== "accessories" && (
                   <ProductForm
                     formData={formData}
-                    brandOptions={brandOptions?.data}
-                    colorOptions={colorOptions?.data}
-                    typeOptions={typeOptions?.data}
+                    brandOptions={brandOptions?.data || []}
+                    colorOptions={colorOptions?.data || []}
+                    typeOptions={typeOptions?.data || []}
                     handleChange={handleChange}
-                    numberOptions={numberObject}
+                    numberOptions={Object.fromEntries(
+                      numberData?.data?.map((number) => [number.number, 0]) ||
+                        {}
+                    )}
                     handleSizeQuantityChange={handleSizeQuantityChange}
                     productType={activeButton}
+                    disabled={
+                      missingData.brands ||
+                      missingData.colors ||
+                      missingData.types
+                    }
                   />
                 )}
-              {isDataLoaded &&
-                activeButton &&
-                activeButton === "accessories" && (
-                  <AccessoriesForm
-                    formData={formData}
-                    brandOptions={brandOptions?.data}
-                    handleChange={handleChange}
-                  />
-                )}
+              {isDataLoaded && activeButton === "accessories" && (
+                <AccessoriesForm
+                  formData={formData}
+                  brandOptions={brandOptions?.data || []}
+                  handleChange={handleChange}
+                  disabled={missingData.brands}
+                />
+              )}
             </CardBody>
             <CardFooter style={{ textAlign: "right" }}>
-              {/* Save button to submit the form */}
-              <Button className="btn-fill" color="primary" onClick={handleSave}>
+              <Button
+                className="btn-fill"
+                color="primary"
+                onClick={handleSave}
+                disabled={
+                  missingData.brands ||
+                  (activeButton !== "accessories" &&
+                    (missingData.colors || missingData.types))
+                }
+              >
                 Save
               </Button>
             </CardFooter>

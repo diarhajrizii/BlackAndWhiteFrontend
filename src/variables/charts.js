@@ -175,8 +175,6 @@ let chartExample2 = {
         0
       );
 
-      console.log(totalQuantity); // This will output the sum of numbers in quantityArray
-
       return {
         totalQuantity,
         labels: [
