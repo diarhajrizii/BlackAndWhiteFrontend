@@ -5,6 +5,11 @@
 .add-item-modal .modal-content .modal-footer {
   padding: 0px 24px 24px 24px;
 }
+
+.modal-search .form-control:focus {
+  z-index: 9999 !important;
+  position: relative;
+}
 .add-item-modal .form-group input {
   margin-bottom: 5px;
 }

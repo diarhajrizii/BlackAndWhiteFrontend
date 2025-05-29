@@ -1,5 +1,4 @@
 import React from "react";
-// nodejs library that concatenates classes
 import classNames from "classnames";
 
 // reactstrap components
@@ -10,55 +9,50 @@ import {
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
-  Input,
   InputGroup,
   NavbarBrand,
   Navbar,
   NavLink,
   Nav,
   Container,
-  Modal,
   NavbarToggler,
-  ModalHeader,
 } from "reactstrap";
+
 import { useAuth } from "views/AuthContext";
+import SearchModal from "modals/SearchModal"; // make sure the path is correct
 
 function AdminNavbar(props) {
   const { logout } = useAuth();
-  const [collapseOpen, setcollapseOpen] = React.useState(false);
-  const [modalSearch, setmodalSearch] = React.useState(false);
-  const [color, setcolor] = React.useState("navbar-transparent");
+  const [collapseOpen, setCollapseOpen] = React.useState(false);
+  const [modalSearch, setModalSearch] = React.useState(false);
+  const [color, setColor] = React.useState("navbar-transparent");
+
   React.useEffect(() => {
     window.addEventListener("resize", updateColor);
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      window.removeEventListener("resize", updateColor);
-    };
+    return () => window.removeEventListener("resize", updateColor);
   });
-  // function that adds color white/transparent to the navbar on resize (this is for the collapse)
+
+  const updateColor = () => {
+    if (window.innerWidth < 993 && collapseOpen) {
+      setColor("bg-white");
+    } else {
+      setColor("navbar-transparent");
+    }
+  };
+
+  const toggleCollapse = () => {
+    setColor(collapseOpen ? "navbar-transparent" : "bg-white");
+    setCollapseOpen(!collapseOpen);
+  };
+
+  const toggleModalSearch = () => {
+    setModalSearch(!modalSearch);
+  };
+
   const logoutSubmit = () => {
     logout();
   };
-  const updateColor = () => {
-    if (window.innerWidth < 993 && collapseOpen) {
-      setcolor("bg-white");
-    } else {
-      setcolor("navbar-transparent");
-    }
-  };
-  // this function opens and closes the collapse on small devices
-  const toggleCollapse = () => {
-    if (collapseOpen) {
-      setcolor("navbar-transparent");
-    } else {
-      setcolor("bg-white");
-    }
-    setcollapseOpen(!collapseOpen);
-  };
-  // this function is to open the Search modal
-  const toggleModalSearch = () => {
-    setmodalSearch(!modalSearch);
-  };
+
   return (
     <>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
@@ -93,12 +87,7 @@ function AdminNavbar(props) {
                 </Button>
               </InputGroup>
               <UncontrolledDropdown nav>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  data-toggle="dropdown"
-                  nav
-                >
+                <DropdownToggle caret color="default" nav>
                   <div className="notification d-none d-lg-block d-xl-block" />
                   <i className="tim-icons icon-sound-wave" />
                   <p className="d-lg-none">Notifications</p>
@@ -166,22 +155,9 @@ function AdminNavbar(props) {
           </Collapse>
         </Container>
       </Navbar>
-      <Modal
-        modalClassName="modal-search"
-        isOpen={modalSearch}
-        toggle={toggleModalSearch}
-      >
-        <ModalHeader>
-          <Input placeholder="SEARCH" type="text" />
-          <button
-            aria-label="Close"
-            className="close"
-            onClick={toggleModalSearch}
-          >
-            <i className="tim-icons icon-simple-remove" />
-          </button>
-        </ModalHeader>
-      </Modal>
+
+      {/* Search Modal Component */}
+      <SearchModal isOpen={modalSearch} toggle={toggleModalSearch} />
     </>
   );
 }
