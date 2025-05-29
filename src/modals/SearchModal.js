@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Modal, ModalHeader, Input } from "reactstrap";
+import { Modal, ModalHeader, Input, ModalBody } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
 import { searchableRoutes } from "../components/Forms/searchableRoutes";
@@ -77,7 +77,7 @@ const SearchModal = ({ isOpen, toggle }) => {
       const isMac = navigator.platform.toUpperCase().includes("MAC");
       const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
 
-      if (ctrlOrCmd && e.key === "/") {
+      if (e.key === "/") {
         e.preventDefault();
         toggle();
       }
@@ -121,7 +121,7 @@ const SearchModal = ({ isOpen, toggle }) => {
       </ModalHeader>
 
       {searchQuery && (
-        <div className="px-4 pb-3">
+        <ModalBody className="px-4 pb-3">
           {filteredResults.length > 0 ? (
             filteredResults.map((item, index) => (
               <div
@@ -139,7 +139,7 @@ const SearchModal = ({ isOpen, toggle }) => {
           ) : (
             <div className="text-muted px-3">No results found</div>
           )}
-        </div>
+        </ModalBody>
       )}
     </Modal>
   );
